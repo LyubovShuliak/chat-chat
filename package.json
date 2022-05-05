@@ -10,7 +10,7 @@
     "server": "npm run watch --prefix server",
     "dev": "yarn server & yarn client",
     "deploy": "npm run build --prefix client && npm start --prefix server",
-    "dev_deploy": "npm run build --prefix client && npm start --prefix server",
+    "dev_deploy": "npm run build --prefix client && npm run watch --prefix server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

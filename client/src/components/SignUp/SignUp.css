@@ -1,0 +1,71 @@
+.con_greating {
+  font-weight: normal;
+  font-family: var(--semibold_font);
+  color: white;
+  margin: auto;
+  font-size: 48px;
+}
+
+.signup_form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  color: #eee;
+  margin: 12% auto 0;
+  top: 100px;
+  width: 18vw;
+  min-width: 350px;
+}
+.signup_form input {
+  border: 2px solid #eeff01;
+  height: 48px;
+  border-radius: 5px;
+  background-color: transparent;
+}
+
+.signup_form .greating {
+  font-family: var(--semibold_font);
+  width: 383px;
+  font-size: 48px;
+  align-self: center;
+}
+
+.password label,
+.email label {
+  font-family: var(--light_font);
+  line-height: 48px;
+  font-size: 18px;
+}
+
+.password,
+.email {
+  font-size: 47%;
+  margin-top: 24px;
+  width: 90%;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+}
+
+#password,
+#email {
+  height: 51px;
+  border-radius: 20px;
+}
+
+.signup_button {
+  font-family: var(--regular_font);
+  width: 12.5vw;
+  min-width: 100px;
+  background: #ea27c3;
+  color: #eee;
+  font-size: 20px;
+  min-width: 200px;
+  line-height: 64px;
+  margin: auto;
+  margin-top: 64px;
+  border: 0;
+  border-radius: 20px;
+  padding: 0;
+}
