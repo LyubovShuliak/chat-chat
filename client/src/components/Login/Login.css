@@ -42,6 +42,7 @@
 #email {
   height: 51px;
   border-radius: 20px;
+  color: white;
 }
 
 .login_button {
@@ -124,4 +125,11 @@
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+.link_back {
+  font-family: var(--light_font);
+  color: var(--link_color);
+  font-size: 14px;
+  background-color: "&#x21a9;";
 }

@@ -1,4 +1,7 @@
 const http = require("http");
+
+const open = require("open");
+
 const { mongoConnect } = require("./services/mongo");
 require("dotenv").config();
 
@@ -11,6 +14,7 @@ async function startServer() {
   mongoConnect();
   server.listen(PORT, () => {
     console.log(`Listening to the port ${PORT}`);
+    // open(`http://localhost:${PORT}/`);
   });
 }
 

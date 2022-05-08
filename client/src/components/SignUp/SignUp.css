@@ -12,7 +12,7 @@
   justify-content: center;
 
   color: #eee;
-  margin: 12% auto 0;
+  margin: 1% auto 0;
   top: 100px;
   width: 18vw;
   min-width: 350px;
@@ -32,14 +32,19 @@
 }
 
 .password label,
-.email label {
+.email label,
+.name label {
   font-family: var(--light_font);
   line-height: 48px;
   font-size: 18px;
 }
+a span {
+  text-decoration: underline;
+}
 
 .password,
-.email {
+.email,
+.name {
   font-size: 47%;
   margin-top: 24px;
   width: 90%;
@@ -49,9 +54,11 @@
 }
 
 #password,
-#email {
+#email,
+#name {
   height: 51px;
   border-radius: 20px;
+  color: white;
 }
 
 .signup_button {
