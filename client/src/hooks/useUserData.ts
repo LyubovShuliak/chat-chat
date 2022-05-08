@@ -27,8 +27,6 @@ function useUserCridentials() {
           navigate("/chat", { replace: true });
         });
       }
-
-      // TODO: Set success basmeed on response.
     }
   }
 
@@ -47,12 +45,14 @@ function useUserCridentials() {
 
         await dispatch(logIn(user));
 
-        if (!store.getState().userReducer.errorMesssage) {
+        const errorMesssage = store.getState().userReducer.errorMesssage;
+
+        if (!errorMesssage) {
           navigate("/chat", { replace: true });
+        } else {
+          return errorMesssage;
         }
       }
-
-      // TODO: Set success basmeed on response.
     }
   }
   return {
