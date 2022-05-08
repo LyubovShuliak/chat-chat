@@ -4,16 +4,16 @@ import { logIn, signUpUser } from "./user.thunks";
 
 interface Log {
   logStatus: boolean;
-
+  isLoading: boolean;
   errorMesssage: String;
 }
-// First, create the thunk
+
 const initialState: Log = {
   logStatus: false,
   errorMesssage: "",
+  isLoading: false,
 };
 
-// Then, handle actions in your reducers:
 const usersSlice = createSlice({
   name: "users",
   initialState,
@@ -21,24 +21,34 @@ const usersSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(signUpUser.fulfilled, (state, action) => {
       state.logStatus = action.payload;
+      state.isLoading = false;
     });
     builder.addCase(logIn.fulfilled, (state, action) => {
       if (action.payload.error) {
         state.errorMesssage = action.payload.error;
+        state.isLoading = false;
       } else {
         state.logStatus = action.payload;
         state.errorMesssage = "";
+        state.isLoading = false;
       }
     });
+    builder.addCase(signUpUser.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(logIn.pending, (state, action) => {
+      state.isLoading = true;
+    });
     builder.addCase(signUpUser.rejected, (state, action) => {
-      console.log(action.error);
+      state.errorMesssage = action.error as String;
     });
     builder.addCase(logIn.rejected, (state, action) => {
-      console.log(action.error);
+      state.errorMesssage = action.error as String;
     });
   },
 });
 
 export const isSignedUp = (state: RootState) => state.userReducer.logStatus;
+export const isLoading = (state: RootState) => state.userReducer.isLoading;
 
 export const { reducer: userReducer } = usersSlice;
