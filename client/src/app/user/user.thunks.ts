@@ -33,5 +33,18 @@ const logIn = createAsyncThunk("login", async (data: User) => {
 
   return result;
 });
+const checkAccesToken = createAsyncThunk("token", async (token: String) => {
+  const response = await fetch(`${API_URL}/token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain",
+    },
+    body: JSON.stringify({ token }),
+  });
 
-export { signUpUser, logIn };
+  const result = await response.json();
+
+  return result;
+});
+
+export { signUpUser, logIn, checkAccesToken };

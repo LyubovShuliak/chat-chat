@@ -1,4 +1,5 @@
 const http = require("http");
+const { Server } = require("socket.io");
 
 const open = require("open");
 
@@ -9,6 +10,11 @@ const app = require("./app");
 
 const PORT = process.env.PORT || 3050;
 const server = http.createServer(app);
+const io = new Server(server);
+
+io.on("connection", (socket) => {
+  console.log("a user connected");
+});
 
 async function startServer() {
   mongoConnect();

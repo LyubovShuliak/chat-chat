@@ -5,7 +5,11 @@ const cors = require("cors");
 
 const userRouter = require("./routes/user/user.router");
 
+require("dotenv").config();
+
 const app = express();
+
+app.set("trust proxy", 1);
 
 app.use(cors());
 app.use(helmet());

@@ -1,11 +1,17 @@
-import React, { FormEvent, useCallback, useEffect, useState } from "react";
+import React, {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 
 import { isLoading } from "../../app/user/user.reducer";
 
-import useUserCridentials from "../../hooks/useUserData";
-import Spinner from "../spiner/Spiner.component";
+import useUserCridentials from "../../hooks/useUserAccessData";
+import Spinner from "../../components/spiner/Spiner.component";
 
 import "./Login.css";
 const Login = () => {
@@ -13,7 +19,7 @@ const Login = () => {
 
   const isLoaded = useAppSelector(isLoading);
 
-  const { submitLogInForm } = useUserCridentials();
+  const { submitLogInForm, validateToken } = useUserCridentials();
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -25,6 +31,16 @@ const Login = () => {
     },
     [error, setError, submitLogInForm]
   );
+  const handleValidation = useCallback(async () => {
+    const errorMesssage = await validateToken();
+    if (errorMesssage) {
+      setError(errorMesssage);
+    }
+  }, [error]);
+
+  useLayoutEffect(() => {
+    handleValidation();
+  }, [handleValidation]);
 
   return (
     <div className="login_container">
