@@ -80,8 +80,6 @@ async function verifyToken(token) {
 
 async function signToken(email) {
   const encoded = await signTokenAsync(email);
-
-  console.log("signToken", encoded);
   return encoded;
 }
 module.exports = {
