@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { checkAccesToken, logIn, signUpUser } from "./user.thunks";
 
@@ -21,18 +21,27 @@ const usersSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(signUpUser.fulfilled, (state, action) => {
-      if (action.payload.error) {
-        state.errorMesssage = action.payload.error;
-        state.isLoading = false;
-      } else {
-        localStorage.setItem("access", action.payload.token);
-        state.errorMesssage = "";
-        state.token = action.payload.token;
-        state.logStatus = true;
-        state.isLoading = false;
+    builder.addCase(
+      signUpUser.fulfilled,
+      (
+        state,
+        action: PayloadAction<{
+          error?: string | undefined;
+          token?: string | undefined;
+        }>
+      ) => {
+        if (action.payload.error) {
+          state.errorMesssage = action.payload.error;
+          state.isLoading = false;
+        } else if (action.payload.token) {
+          localStorage.setItem("access", action.payload.token);
+          state.errorMesssage = "";
+          state.token = action.payload.token;
+          state.logStatus = true;
+          state.isLoading = false;
+        }
       }
-    });
+    );
     builder.addCase(logIn.fulfilled, (state, action) => {
       if (action.payload.error) {
         state.errorMesssage = action.payload.error;
@@ -59,13 +68,13 @@ const usersSlice = createSlice({
         state.isLoading = false;
       }
     });
-    builder.addCase(signUpUser.pending, (state, action) => {
+    builder.addCase(signUpUser.pending, (state) => {
       state.isLoading = true;
     });
-    builder.addCase(logIn.pending, (state, action) => {
+    builder.addCase(logIn.pending, (state) => {
       state.isLoading = true;
     });
-    builder.addCase(checkAccesToken.pending, (state, action) => {
+    builder.addCase(checkAccesToken.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(signUpUser.rejected, (state, action) => {
@@ -77,9 +86,8 @@ const usersSlice = createSlice({
   },
 });
 
-export const isSignedUp = (state: RootState) => state.userReducer.logStatus;
-export const isLoading = (state: RootState) => state.userReducer.isLoading;
-export const error = (state: RootState) => state.userReducer.errorMesssage;
-export const token = (state: RootState) => state.userReducer.token;
+export const isLoading = (state: RootState) => state.user.isLoading;
+export const error = (state: RootState) => state.user.errorMesssage;
+export const token = (state: RootState) => state.user.token;
 
 export const { reducer: userReducer } = usersSlice;

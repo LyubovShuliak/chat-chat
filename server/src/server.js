@@ -4,13 +4,18 @@ const { Server } = require("socket.io");
 const open = require("open");
 
 const { mongoConnect } = require("./services/mongo");
+
 require("dotenv").config();
 
 const app = require("./app");
 
 const PORT = process.env.PORT || 3050;
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
 io.on("connection", (socket) => {
   console.log("a user connected");

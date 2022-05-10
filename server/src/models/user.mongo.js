@@ -18,6 +18,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  rooms: {
+    type: [
+      {
+        message: String,
+        messageType: "user" | "responder",
+      },
+    ],
+    required: false,
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);

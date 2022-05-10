@@ -1,0 +1,15 @@
+.messages_container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+}
+.list {
+  background-color: aqua;
+  height: 600px;
+  width: 200px;
+}
+.fi {
+  width: 60px;
+  height: 60px;
+}

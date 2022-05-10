@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 
 require("dotenv").config();
 async function verifyTokenAsync(token) {
-  if (!token) return reject({ error: "No access token" });
+  if (!token) return { error: "No access token" };
   return new Promise((resolve, reject) =>
     jwt.verify(token, process.env.JWTKEY, (err, decoded) =>
       err ? reject({ err }) : resolve(decoded)
@@ -13,7 +13,7 @@ async function verifyTokenAsync(token) {
   );
 }
 async function signTokenAsync(email) {
-  if (!email) return eject({ error: "No email" });
+  if (!email) return { error: "No email" };
   return new Promise((resolve, reject) =>
     jwt.sign(
       { email },

@@ -49,7 +49,7 @@ function useUserCridentials() {
 
         await dispatch(signUpUser(user));
 
-        const errorMesssage = store.getState().userReducer.errorMesssage;
+        const errorMesssage = store.getState().user.errorMesssage;
 
         if (!errorMesssage) {
           navigation();
@@ -75,7 +75,7 @@ function useUserCridentials() {
 
         await dispatch(logIn(user));
 
-        const errorMesssage = store.getState().userReducer.errorMesssage;
+        const errorMesssage = store.getState().user.errorMesssage;
 
         if (!errorMesssage) {
           navigation();

@@ -69,6 +69,10 @@ p {
 .not_visible {
   display: none;
 }
+button {
+  border: none;
+  background-color: transparent;
+}
 /*< rewrite  default props of tag */
 @font-face {
   font-family: "Poppins-Bold";
