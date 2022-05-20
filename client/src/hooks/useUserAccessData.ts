@@ -1,45 +1,51 @@
-import { FormEvent } from "react";
+import { FormEvent, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { store } from "../app/store";
-import { error, token } from "../app/user/user.reducer";
+import { error, logStatus, signOutUser } from "../app/user/user.reducer";
 import {
   checkAccesToken,
   logIn,
   signUpUser,
   User,
 } from "../app/user/user.thunks";
+import { socketApi } from "./socketConfg";
 
 function useUserCridentials() {
   const dispatch = useAppDispatch();
   let navigate = useNavigate();
+
   const errorMesssage = useAppSelector(error);
+  const isLogged = useAppSelector(logStatus);
 
   function navigation() {
-    navigate("/chat", { replace: true });
+    navigate("/", { replace: true });
   }
 
-  async function validateToken() {
+  const validateToken = useCallback(async () => {
     const token = localStorage.getItem("access");
 
-    if (!token) return navigate("/login", { replace: true });
+    if (!token) return;
 
     await dispatch(checkAccesToken(token));
-    if (!errorMesssage) {
-      navigate("/chat", { replace: true });
+
+    if (store.getState().user.logStatus) {
+      socketApi.connect();
+      return navigate("/", { replace: true });
     } else {
-      return errorMesssage;
+      socketApi.disconnect();
+      return navigate("/login", { replace: true });
     }
-  }
+  }, []);
 
   async function submitSignupForm(e: FormEvent) {
     e.preventDefault();
     if (e.target) {
       const Form = e.target as HTMLFormElement;
       const data = new FormData(Form);
-      const email = data.get("email") as String;
-      const userName = data.get("name") as String;
-      const password = data.get("password") as String;
+      const email = data.get("email") as string;
+      const userName = data.get("name") as string;
+      const password = data.get("password") as string;
       if (email && userName && password) {
         const user: User = {
           email,
@@ -52,8 +58,10 @@ function useUserCridentials() {
         const errorMesssage = store.getState().user.errorMesssage;
 
         if (!errorMesssage) {
+          socketApi.connect();
           navigation();
         } else {
+          socketApi.disconnect();
           return errorMesssage;
         }
       }
@@ -65,8 +73,8 @@ function useUserCridentials() {
     if (e.target) {
       const Form = e.target as HTMLFormElement;
       const data = new FormData(Form);
-      const email = data.get("email") as String;
-      const password = data.get("password") as String;
+      const email = data.get("email") as string;
+      const password = data.get("password") as string;
       if (email && password) {
         const user = {
           email,
@@ -78,7 +86,9 @@ function useUserCridentials() {
         const errorMesssage = store.getState().user.errorMesssage;
 
         if (!errorMesssage) {
+          socketApi.connect();
           navigation();
+          console.log(store.getState().user.user);
         } else {
           return errorMesssage;
         }
@@ -87,7 +97,8 @@ function useUserCridentials() {
   }
 
   function signOut() {
-    delete localStorage.access;
+    dispatch(signOutUser());
+    socketApi.disconnect();
   }
 
   return {
@@ -95,6 +106,8 @@ function useUserCridentials() {
     submitLogInForm,
     validateToken,
     signOut,
+    dispatch,
+    isLogged,
   };
 }
 

@@ -1,12 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { socketApi } from "../../hooks/socketConfg";
 import { RootState } from "../store";
 import { checkAccesToken, logIn, signUpUser } from "./user.thunks";
 
 interface Log {
   logStatus: boolean;
   isLoading: boolean;
-  errorMesssage: String;
-  token: String;
+  errorMesssage: string;
+  token: string;
+  user: {
+    email: string;
+    userName: string;
+  };
 }
 
 const initialState: Log = {
@@ -14,40 +19,62 @@ const initialState: Log = {
   token: "",
   errorMesssage: "",
   isLoading: false,
+  user: {
+    email: "",
+    userName: "",
+  },
 };
 
 const usersSlice = createSlice({
   name: "users",
   initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(
-      signUpUser.fulfilled,
-      (
-        state,
-        action: PayloadAction<{
-          error?: string | undefined;
-          token?: string | undefined;
-        }>
-      ) => {
-        if (action.payload.error) {
-          state.errorMesssage = action.payload.error;
-          state.isLoading = false;
-        } else if (action.payload.token) {
-          localStorage.setItem("access", action.payload.token);
-          state.errorMesssage = "";
-          state.token = action.payload.token;
-          state.logStatus = true;
-          state.isLoading = false;
-        }
+  reducers: {
+    signOutUser: (state) => {
+      state.logStatus = false;
+      state.errorMesssage = "";
+      state.token = "";
+      state.isLoading = false;
+      delete localStorage.access;
+    },
+    checkIsLoged: (state) => {
+      const token = localStorage.getItem("access");
+      if (!token) {
+        state.logStatus = false;
+        state.errorMesssage = "";
+        state.token = "";
+        state.isLoading = false;
+      } else {
+        state.logStatus = true;
+        state.errorMesssage = "";
+        state.token = "";
+        state.isLoading = false;
       }
-    );
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(signUpUser.fulfilled, (state, action) => {
+      if (action.payload.error) {
+        state.errorMesssage = action.payload.error;
+        state.isLoading = false;
+      } else if (action.payload.token) {
+        localStorage.setItem("access", action.payload.token);
+
+        state.user = action.payload.user;
+        state.errorMesssage = "";
+        state.token = action.payload.token;
+        state.logStatus = true;
+        state.isLoading = false;
+      }
+    });
     builder.addCase(logIn.fulfilled, (state, action) => {
       if (action.payload.error) {
         state.errorMesssage = action.payload.error;
         state.isLoading = false;
       } else {
         localStorage.setItem("access", action.payload.token);
+
+        state.user = action.payload.user;
+
         state.token = action.payload.token;
         state.logStatus = true;
         state.errorMesssage = "";
@@ -56,13 +83,11 @@ const usersSlice = createSlice({
     });
     builder.addCase(checkAccesToken.fulfilled, (state, action) => {
       if (action.payload.error) {
-        console.log(action.payload.error);
-
         state.errorMesssage = "Session is ended. You must log in again.";
         state.isLoading = false;
       } else {
-        localStorage.setItem("access", action.payload.token);
         state.token = action.payload.token;
+        state.user = action.payload.user;
         state.logStatus = true;
         state.errorMesssage = "";
         state.isLoading = false;
@@ -78,16 +103,19 @@ const usersSlice = createSlice({
       state.isLoading = true;
     });
     builder.addCase(signUpUser.rejected, (state, action) => {
-      state.errorMesssage = action.error as String;
+      state.errorMesssage = action.error as string;
     });
     builder.addCase(logIn.rejected, (state, action) => {
-      state.errorMesssage = action.error as String;
+      state.errorMesssage = action.error as string;
     });
   },
 });
 
+export const { signOutUser, checkIsLoged } = usersSlice.actions;
+
 export const isLoading = (state: RootState) => state.user.isLoading;
 export const error = (state: RootState) => state.user.errorMesssage;
 export const token = (state: RootState) => state.user.token;
+export const logStatus = (state: RootState) => state.user.logStatus;
 
 export const { reducer: userReducer } = usersSlice;

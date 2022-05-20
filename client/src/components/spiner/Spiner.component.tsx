@@ -7,7 +7,6 @@ import "./spiner.css";
 export default function Spinner() {
   return (
     <div className="spinerOverlay">
-      {" "}
       <Box sx={{ display: "flex" }}>
         <CircularProgress />
       </Box>

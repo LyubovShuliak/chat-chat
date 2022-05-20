@@ -11,13 +11,13 @@ import useUserCridentials from "../../hooks/useUserAccessData";
 
 import "./SignUp.css";
 import { useAppSelector } from "../../app/hooks";
-import { isLoading } from "../../app/user/user.reducer";
+import { checkIsLoged, isLoading } from "../../app/user/user.reducer";
 import Spinner from "../../components/spiner/Spiner.component";
 const SignUp = () => {
-  const [error, setError] = useState<String>("");
+  const [error, setError] = useState<string>("");
   const isLoaded = useAppSelector(isLoading);
 
-  const { submitSignupForm, validateToken } = useUserCridentials();
+  const { isLogged, submitSignupForm, validateToken } = useUserCridentials();
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -29,18 +29,12 @@ const SignUp = () => {
     },
     [error, setError, submitSignupForm]
   );
-  const handleValidation = useCallback(async () => {
-    const errorMesssage = await validateToken();
-    if (errorMesssage) {
-      setError(errorMesssage);
-    }
-  }, [error, setError, validateToken]);
 
-  useEffect(() => {
-    handleValidation();
-  }, [handleValidation]);
+  useLayoutEffect(() => {
+    validateToken();
+  }, []);
 
-  return (
+  return isLoaded && isLogged ? null : (
     <form className="signup_form" method="post" onSubmit={handleSubmit}>
       <h1 className="greating">Create account</h1>
       <Link

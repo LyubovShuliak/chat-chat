@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
-    "watch": "nodemon src/server.js"
+    "watch": "nodemon src/server.js "
   },
   "author": "",
   "license": "ISC",
@@ -14,15 +14,18 @@
     "node": "18.0.0"
   },
   "dependencies": {
+    "@socket.io/redis-adapter": "^7.2.0",
     "bcrypt": "^5.0.1",
     "chat-app": "file:..",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
+    "emoji-js": "^3.7.0",
     "express": "^4.18.1",
     "foreman": "^3.0.1",
     "helmet": "^5.0.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.3.1",
+    "redis": "^4.1.0",
     "socket.io": "^4.5.0",
     "uuid": "^8.3.2"
   },

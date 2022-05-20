@@ -1,35 +1,48 @@
-import React, { useCallback, useEffect, useLayoutEffect } from "react";
-import { Link } from "react-router-dom";
-import Messages from "../../components/Messages/Messages.component";
+import { Navigate, useNavigate } from "react-router-dom";
 
-import "./chat_page.css";
+import Messages from "../../components/Messages/Messages.component";
+import SendMessage from "../../components/SendMessage/SendMessage.conponent";
+import Chats from "../../components/Chats/Chats.component";
 
 import useUserCridentials from "../../hooks/useUserAccessData";
-import useHandleMessages from "../../hooks/handleMessages";
-import SendMessage from "../../components/SendMessage/SendMessage.conponent";
+import { useAppSelector } from "../../app/hooks";
+import { isLoading } from "../../app/user/user.reducer";
+
+import styles from "./chat_page.module.css";
+import { useEffect, useState } from "react";
+import { socketApi } from "../../hooks/socketConfg";
+
 const ChatPage = () => {
-  const { signOut, validateToken } = useUserCridentials();
-  const handleValidation = useCallback(async () => {
-    await validateToken();
+  const { isLogged } = useUserCridentials();
+
+  const navigation = useNavigate();
+
+  useEffect(() => {
+    if (
+      !window.performance
+        .getEntriesByType("navigation")
+        .map((nav: any) => nav.type)
+        .includes("reload") &&
+      !isLogged
+    ) {
+      navigation("/signup", { replace: true });
+    }
   }, []);
 
-  useLayoutEffect(() => {
-    handleValidation();
-  }, [handleValidation]);
-  const { flag } = useHandleMessages();
+  useEffect(() => {
+    socketApi.on("disconnect", () => {
+      socketApi.connect();
+    });
+  });
 
   return (
-    <div className="messages_container">
-      <Link to="/login" onClick={signOut}>
-        Log out
-      </Link>
-      <div>
-        <span className="fi fi-gr"></span>
-        <span className="fi fi-gr fis"></span>
-      </div>
+    <div className={styles.messages_container}>
+      <Chats />
 
-      <Messages />
-      <SendMessage />
+      <div className={styles.messages_block}>
+        <Messages />
+        <SendMessage />
+      </div>
     </div>
   );
 };

@@ -1,0 +1,22 @@
+.user {
+  background-color: aliceblue;
+  border-radius: 10px;
+  width: fit-content;
+  padding: 10px 20px;
+}
+
+.message_text {
+  float: left;
+}
+
+.time {
+  color: lightgrey;
+  position: sticky;
+  bottom: -10px;
+
+  font-size: 14px;
+}
+.messageInformation {
+  display: flex;
+  flex-direction: row;
+}

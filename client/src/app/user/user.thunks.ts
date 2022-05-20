@@ -2,9 +2,9 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const API_URL = "http://localhost:3050/api";
 export interface User {
-  userName?: String;
-  password: String;
-  email?: String;
+  userName?: string;
+  password: string;
+  email?: string;
 }
 
 const signUpUser = createAsyncThunk("signup", async (data: User) => {
@@ -33,11 +33,11 @@ const logIn = createAsyncThunk("login", async (data: User) => {
 
   return result;
 });
-const checkAccesToken = createAsyncThunk("token", async (token: String) => {
+const checkAccesToken = createAsyncThunk("token", async (token: string) => {
   const response = await fetch(`${API_URL}/token`, {
     method: "POST",
     headers: {
-      "Content-Type": "text/plain",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ token }),
   });

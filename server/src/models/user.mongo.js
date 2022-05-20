@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // avatar: {
+  //   type: Blob,
+  //   required: false,
+  // },
 
   password: {
     type: String,
@@ -25,6 +29,14 @@ const userSchema = new mongoose.Schema({
         messageType: "user" | "responder",
       },
     ],
+    required: false,
+  },
+  contacts: {
+    type: [String],
+    required: false,
+  },
+  sessions: {
+    type: [String],
     required: false,
   },
 });

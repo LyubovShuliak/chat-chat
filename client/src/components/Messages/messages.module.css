@@ -1,0 +1,16 @@
+.messages_container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: scroll;
+
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.messages_container::-webkit-scrollbar {
+  display: none;
+}
+.scrollDiv {
+  pointer-events: none;
+}

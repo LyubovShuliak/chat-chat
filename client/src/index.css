@@ -21,9 +21,8 @@
 }
 
 body {
-  position: relative;
   width: 100%;
-  background-color: #0a1b34;
+  background: url("./assets/images/background.jpg");
 
   padding: 0;
   margin: 0;

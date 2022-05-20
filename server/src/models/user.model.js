@@ -21,15 +21,31 @@ async function signTokenAsync(email) {
       {
         expiresIn: "24h",
       },
-      (err, decoded) => (err ? reject({ err }) : resolve(decoded))
+      (err, encoded) => (err ? reject({ err }) : resolve(encoded))
     )
   );
 }
 
-async function findUserByUser(email) {
-  return await userDatabase.findOne({ email: email }, "password id");
+async function getAllUsers(limit, skip) {
+  const contacts = await userDatabase
+    .find({}, "userName")
+    .skip(skip)
+    .limit(limit);
+  return contacts;
 }
 
+async function findUserByUser(email) {
+  return await userDatabase.findOne(
+    { email: email },
+    "password id email userName"
+  );
+}
+async function findBySearchQuery(searchQuery) {
+  const findByName = await userDatabase
+    .find({ name: `/${searchQuery}/` }, { __v: 0, _id: 0 })
+    .limit(20);
+  return findByName;
+}
 async function signUp(user) {
   const { password, email } = user;
   const saltRounds = 10;
@@ -59,6 +75,7 @@ async function signUp(user) {
       console.error(err);
     }
   });
+  return { userName: newUser.userName, email: newUser.email };
 }
 
 async function logIn(user) {
@@ -66,25 +83,29 @@ async function logIn(user) {
 
   const userPassword = await findUserByUser(email);
 
-  if (!userPassword) {
+  if (!Object.keys(userPassword).length) {
     return new Error("You must sign up");
   }
 
-  return await bcrypt.compare(password, userPassword.password);
-}
-async function verifyToken(token) {
-  const encoded = await verifyTokenAsync(token);
-
-  return encoded;
+  await bcrypt.compare(password, userPassword.password);
+  return { userName: userPassword.userName, email: userPassword.email };
 }
 
-async function signToken(email) {
-  const encoded = await signTokenAsync(email);
-  return encoded;
+async function downLoadAvtar(blob, email) {
+  const user = await userDatabase.findByIdAndUpdate(
+    { email: email },
+    { avatar: blob }
+  );
+  return user;
 }
+
 module.exports = {
+  getAllUsers,
   signUp,
   logIn,
-  verifyToken,
-  signToken,
+  verifyTokenAsync,
+  signTokenAsync,
+  findBySearchQuery,
+  findUserByUser,
+  downLoadAvtar,
 };

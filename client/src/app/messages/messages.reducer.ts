@@ -2,24 +2,27 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { RootState } from "../store";
 import { v4 as uuid4 } from "uuid";
+import { Message } from "@mui/icons-material";
 
-export interface Message {
-  message: String;
+export type Message = {
+  message: string;
   messageType: "user" | "responder";
-  id: String;
-}
+  id: string;
+};
 
 type Rooms = {
   [key: string]: Message[];
 };
 
-const initialState: Rooms = { test: [] };
+const initialState: Rooms = {
+  test: [],
+};
 
 const messagesSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
-    sendingMessage: (state, action: PayloadAction<{ message: String }>) => {
+    sendingMessage: (state, action: PayloadAction<{ message: string }>) => {
       state.test.push({
         message: action.payload.message,
         id: uuid4(),
@@ -30,7 +33,6 @@ const messagesSlice = createSlice({
       state.test = state.test.filter((mes) => mes.id === action.payload);
     },
   },
-  extraReducers: (builder) => {},
 });
 
 export const { sendingMessage, deletingMessage } = messagesSlice.actions;

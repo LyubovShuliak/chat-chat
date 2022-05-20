@@ -1,27 +1,32 @@
-import { keyboard } from "@testing-library/user-event/dist/types/keyboard";
-import React from "react";
-import { useAppSelector } from "../../app/hooks";
-import { Message, messages } from "../../app/messages/messages.reducer";
-import SendMessage from "../../components/SendMessage/SendMessage.conponent";
+import { useEffect, useState } from "react";
+import { Message } from "../../app/messages/messages.reducer";
+import { store } from "../../app/store";
+import useHandleMessages from "../../hooks/handleMessages";
+import { socketApi } from "../../hooks/socketConfg";
+
 import MessageListItem from "../Message/MessageListItem.component";
+
+import styles from "./messages.module.css";
 const Messages = () => {
-  const sentMessages = useAppSelector(messages);
+  const { messagesContainer, sentMessages, sendMessage, setMessage } =
+    useHandleMessages();
+  useEffect(() => {
+    socketApi.on("chat message", (msg) => {
+      setMessage(msg);
+      sendMessage(msg);
+    });
+  }, []);
 
   return (
-    <ul>
+    <div className={styles.messages_container}>
       {sentMessages.test.length
         ? sentMessages.test.map((message: Message) => {
-            const { id, message: messageText, messageType } = message;
-            return (
-              <MessageListItem
-                message={messageText}
-                id={id}
-                messageType={messageType}
-              />
-            );
+            return <MessageListItem key={message.id} {...message} />;
           })
         : null}
-    </ul>
+
+      <div ref={messagesContainer} className={styles.scrollDiv} />
+    </div>
   );
 };
 

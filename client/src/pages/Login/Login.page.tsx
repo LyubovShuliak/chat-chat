@@ -15,11 +15,11 @@ import Spinner from "../../components/spiner/Spiner.component";
 
 import "./Login.css";
 const Login = () => {
-  const [error, setError] = useState<String>("");
+  const [error, setError] = useState<string>("");
 
   const isLoaded = useAppSelector(isLoading);
 
-  const { submitLogInForm, validateToken } = useUserCridentials();
+  const { submitLogInForm, isLogged } = useUserCridentials();
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -31,18 +31,13 @@ const Login = () => {
     },
     [error, setError, submitLogInForm]
   );
-  const handleValidation = useCallback(async () => {
-    const errorMesssage = await validateToken();
-    if (errorMesssage) {
-      setError(errorMesssage);
-    }
-  }, [error]);
+  const { validateToken } = useUserCridentials();
 
-  useLayoutEffect(() => {
-    handleValidation();
-  }, [handleValidation]);
+  useEffect(() => {
+    validateToken();
+  }, []);
 
-  return (
+  return isLoaded && isLogged ? null : (
     <div className="login_container">
       <form onSubmit={handleSubmit} method="post" className="login_form">
         <Link to="/" className="link_back">
