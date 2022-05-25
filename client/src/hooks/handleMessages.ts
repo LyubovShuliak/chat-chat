@@ -5,9 +5,11 @@ import {
   messages,
   sendingMessage,
 } from "../app/messages/messages.reducer";
-import { socketApi } from "./socketConfg";
+import useUserCredentials from "./useUserAccessData";
 
 const useHandleMessages = () => {
+  const { socketApi } = useUserCredentials();
+
   const [message, setMessage] = useState<string>("");
 
   const [chosenEmoji, setChosenEmoji] = useState(null);

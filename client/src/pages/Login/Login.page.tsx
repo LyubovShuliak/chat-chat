@@ -10,7 +10,7 @@ import { useAppSelector } from "../../app/hooks";
 
 import { isLoading } from "../../app/user/user.reducer";
 
-import useUserCridentials from "../../hooks/useUserAccessData";
+import useUserCredentials from "../../hooks/useUserAccessData";
 import Spinner from "../../components/spiner/Spiner.component";
 
 import "./Login.css";
@@ -19,7 +19,7 @@ const Login = () => {
 
   const isLoaded = useAppSelector(isLoading);
 
-  const { submitLogInForm, isLogged } = useUserCridentials();
+  const { submitLogInForm, isLogged } = useUserCredentials();
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -31,7 +31,7 @@ const Login = () => {
     },
     [error, setError, submitLogInForm]
   );
-  const { validateToken } = useUserCridentials();
+  const { validateToken } = useUserCredentials();
 
   useEffect(() => {
     validateToken();
@@ -40,7 +40,7 @@ const Login = () => {
   return isLoaded && isLogged ? null : (
     <div className="login_container">
       <form onSubmit={handleSubmit} method="post" className="login_form">
-        <Link to="/" className="link_back">
+        <Link to="/signup" className="link_back">
           Back to signup page
         </Link>
         <p className="error"> {error}</p>

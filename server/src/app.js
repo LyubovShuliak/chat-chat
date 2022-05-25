@@ -6,8 +6,6 @@ const cors = require("cors");
 const userRouter = require("./routes/user/user.router");
 const contactsRouter = require("./routes/contacts/contacts.router");
 
-const emoji = require("./services/emoji.service");
-
 require("dotenv").config();
 
 const app = express();
@@ -18,14 +16,14 @@ app.use(cors());
 app.use(helmet());
 
 app.use(express.json());
-// app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use("/api", userRouter);
 
 app.use("/api/contacts", contactsRouter);
 
-// app.get("/", (req, res) => {
-//   res.send(path.join(__dirname, "..", "public", "index.html"));
-// });
+app.get("/", (req, res) => {
+  res.send(path.join(__dirname, "..", "public", "index.html"));
+});
 
 module.exports = app;

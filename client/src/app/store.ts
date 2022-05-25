@@ -1,9 +1,4 @@
-import {
-  configureStore,
-  ThunkAction,
-  Action,
-  combineReducers,
-} from "@reduxjs/toolkit";
+import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import { contactReducer } from "./contacts/contacts.reducer";
 import { messageReducer } from "./messages/messages.reducer";
 

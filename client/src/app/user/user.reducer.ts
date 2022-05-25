@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { socketApi } from "../../hooks/socketConfg";
 import { RootState } from "../store";
 import { checkAccesToken, logIn, signUpUser } from "./user.thunks";
 
@@ -35,10 +34,13 @@ const usersSlice = createSlice({
       state.token = "";
       state.isLoading = false;
       delete localStorage.access;
+      delete localStorage.user;
     },
     checkIsLoged: (state) => {
       const token = localStorage.getItem("access");
-      if (!token) {
+      const user = localStorage.getItem("user");
+
+      if (!token && !user) {
         state.logStatus = false;
         state.errorMesssage = "";
         state.token = "";
@@ -58,8 +60,7 @@ const usersSlice = createSlice({
         state.isLoading = false;
       } else if (action.payload.token) {
         localStorage.setItem("access", action.payload.token);
-
-        state.user = action.payload.user;
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
         state.errorMesssage = "";
         state.token = action.payload.token;
         state.logStatus = true;
@@ -72,6 +73,7 @@ const usersSlice = createSlice({
         state.isLoading = false;
       } else {
         localStorage.setItem("access", action.payload.token);
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
 
         state.user = action.payload.user;
 
@@ -86,6 +88,8 @@ const usersSlice = createSlice({
         state.errorMesssage = "Session is ended. You must log in again.";
         state.isLoading = false;
       } else {
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
+
         state.token = action.payload.token;
         state.user = action.payload.user;
         state.logStatus = true;

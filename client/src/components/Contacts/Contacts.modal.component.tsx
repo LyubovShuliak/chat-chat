@@ -20,6 +20,7 @@ import {
   Search,
   SearchIconWrapper,
 } from "../SearchBar/ChatSearchBar.component";
+import AllRegisteredUsers from "../AllUsers/AllUsersModal.component";
 
 const style = {
   position: "absolute" as "absolute",
@@ -34,7 +35,8 @@ const style = {
 };
 
 export default function ContactsModal() {
-  const { handleOpen, handleClose, open, focused } = useProfileFeatures();
+  const { handleOpen, handleClose, open, focused, addContact } =
+    useProfileFeatures();
 
   return (
     <div>
@@ -57,6 +59,7 @@ export default function ContactsModal() {
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+        disableScrollLock={true}
       >
         <Box sx={style}>
           <h1>Contacts</h1>
@@ -101,6 +104,7 @@ export default function ContactsModal() {
             </ListItem>
           </List>
           <Button onClick={handleClose}>Close</Button>
+          <AllRegisteredUsers />
         </Box>
       </Modal>
     </div>

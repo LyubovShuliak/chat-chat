@@ -11,6 +11,7 @@ RUN npm run build --prefix client
 COPY server/ ./server/
 RUN npm run install-server --only=production
 
+RUN npm start --prefix server
 
 
 USER node

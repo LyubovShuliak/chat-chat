@@ -19,12 +19,21 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log(socket.id);
   socketConnected(socket, io);
+});
+io.use((socket, next) => {
+  const email = socket.handshake.auth.email;
+  console.log(email);
+
+  if (!email) {
+    return next(new Error("invalid username"));
+  }
+  socket.email = email;
+  next();
 });
 
 function startServer() {
-  mongoConnect();
+  mongoConnect(io);
   server.listen(PORT, () => {
     console.log(`Listening to the port ${PORT}`);
     // open(`http://localhost:${PORT}/`);

@@ -28,21 +28,48 @@ async function signTokenAsync(email) {
 
 async function getAllUsers(limit, skip) {
   const contacts = await userDatabase
-    .find({}, "userName")
+    .find({}, { _id: 0, userName: 1, email: 1, id: 1 })
     .skip(skip)
     .limit(limit);
   return contacts;
 }
 
-async function findUserByUser(email) {
-  return await userDatabase.findOne(
-    { email: email },
-    "password id email userName"
+async function addContact(contact, email) {
+  const user = await userDatabase
+    .findOne({ email: email }, { __v: 0, _id: 0 })
+    .lean();
+
+  const contactAdded = user.contacts.findIndex(
+    (userContact) => contact.email === userContact.email
   );
+
+  console.log("contactAdded", contactAdded);
+
+  if (contactAdded) return { error: "contact added" };
+  if (!user.contacts.length) {
+    const contacts = {
+      contacts: [contact],
+    };
+    await userDatabase.updateOne({ email: email }, contacts);
+    return await findUserByEmail(email);
+  } else {
+    const contacts = {
+      contacts: [...user.contacts, contact],
+    };
+
+    await userDatabase.updateOne({ email: email }, contacts);
+    return await findUserByEmail(email);
+  }
+}
+async function findUserByEmail(email) {
+  return await userDatabase.findOne({ email: email });
+}
+async function getUserContacts(email) {
+  return await userDatabase.findOne({ email: email }, "contacts");
 }
 async function findBySearchQuery(searchQuery) {
   const findByName = await userDatabase
-    .find({ name: `/${searchQuery}/` }, { __v: 0, _id: 0 })
+    .find({ userName: `/${searchQuery}/` }, { __v: 0, _id: 0 })
     .limit(20);
   return findByName;
 }
@@ -50,18 +77,21 @@ async function signUp(user) {
   const { password, email } = user;
   const saltRounds = 10;
 
-  const doesUserAlreadySignUp = await findUserByUser(email);
+  const doesUserAlreadySignUp = await findUserByEmail(email);
 
   if (doesUserAlreadySignUp) {
     return {
       error:
-        "You already signed up with this email. Do you want to login whith your credetials?",
+        "You already signed up with this email. Do you want to login with your credentials?",
     };
   }
 
   const newUser = {
     ...user,
     id: uuidv4(),
+    rooms: [],
+    contacts: [],
+    sessions: [],
   };
 
   bcrypt.hash(password, saltRounds, async (err, hash) => {
@@ -81,7 +111,7 @@ async function signUp(user) {
 async function logIn(user) {
   const { password, email } = user;
 
-  const userPassword = await findUserByUser(email);
+  const userPassword = await findUserByEmail(email);
 
   if (!Object.keys(userPassword).length) {
     return new Error("You must sign up");
@@ -91,21 +121,14 @@ async function logIn(user) {
   return { userName: userPassword.userName, email: userPassword.email };
 }
 
-async function downLoadAvtar(blob, email) {
-  const user = await userDatabase.findByIdAndUpdate(
-    { email: email },
-    { avatar: blob }
-  );
-  return user;
-}
-
 module.exports = {
-  getAllUsers,
-  signUp,
-  logIn,
   verifyTokenAsync,
   signTokenAsync,
+  getAllUsers,
+  addContact,
+  findUserByEmail,
+  getUserContacts,
   findBySearchQuery,
-  findUserByUser,
-  downLoadAvtar,
+  signUp,
+  logIn,
 };

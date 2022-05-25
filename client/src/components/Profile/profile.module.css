@@ -1,0 +1,17 @@
+@keyframes show {
+  from {
+    height: 0%;
+  }
+  to {
+    height: 40%;
+  }
+}
+
+@keyframes hide {
+  from {
+    height: 40%;
+  }
+  to {
+    height: 0;
+  }
+}

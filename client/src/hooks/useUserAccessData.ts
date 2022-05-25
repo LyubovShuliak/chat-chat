@@ -1,4 +1,4 @@
-import { FormEvent, useCallback } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { store } from "../app/store";
@@ -9,14 +9,32 @@ import {
   signUpUser,
   User,
 } from "../app/user/user.thunks";
-import { socketApi } from "./socketConfg";
 
-function useUserCridentials() {
+import { io } from "socket.io-client";
+const url = "http://localhost:3050/";
+const socketApi = io(url, {
+  autoConnect: false,
+});
+
+function useUserCredentials() {
+  const [user, setUser] = useState<{
+    email: string;
+    userName: string;
+  }>({
+    email: "",
+    userName: "",
+  });
+
   const dispatch = useAppDispatch();
   let navigate = useNavigate();
 
   const errorMesssage = useAppSelector(error);
   const isLogged = useAppSelector(logStatus);
+
+  useEffect(() => {
+    socketApi.auth = { email: user.email };
+    socketApi.connect();
+  }, [user]);
 
   function navigation() {
     navigate("/", { replace: true });
@@ -30,7 +48,6 @@ function useUserCridentials() {
     await dispatch(checkAccesToken(token));
 
     if (store.getState().user.logStatus) {
-      socketApi.connect();
       return navigate("/", { replace: true });
     } else {
       socketApi.disconnect();
@@ -58,7 +75,6 @@ function useUserCridentials() {
         const errorMesssage = store.getState().user.errorMesssage;
 
         if (!errorMesssage) {
-          socketApi.connect();
           navigation();
         } else {
           socketApi.disconnect();
@@ -86,9 +102,7 @@ function useUserCridentials() {
         const errorMesssage = store.getState().user.errorMesssage;
 
         if (!errorMesssage) {
-          socketApi.connect();
           navigation();
-          console.log(store.getState().user.user);
         } else {
           return errorMesssage;
         }
@@ -107,8 +121,11 @@ function useUserCridentials() {
     validateToken,
     signOut,
     dispatch,
+    user,
+    setUser,
     isLogged,
+    socketApi,
   };
 }
 
-export default useUserCridentials;
+export default useUserCredentials;

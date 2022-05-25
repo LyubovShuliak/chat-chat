@@ -1,8 +1,9 @@
 const express = require("express");
-const { httpGetAllUsers } = require("./contacts.controler");
+const { httpGetAllUsers, httpAddContact } = require("./contacts.controler");
 
 const contactsRouter = express.Router();
 
 contactsRouter.get("/", httpGetAllUsers);
+contactsRouter.post("/", httpAddContact);
 
 module.exports = contactsRouter;

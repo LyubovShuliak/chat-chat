@@ -11,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import ChatSearchBar from "../SearchBar/ChatSearchBar.component";
 
 import styles from "./chats.module.css";
+import { SimpleSlider } from "../Carousel/Carousel.component";
 
 export default function Chats() {
   return (

@@ -7,7 +7,7 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 
-import useUserCridentials from "../../hooks/useUserAccessData";
+import useUserCredentials from "../../hooks/useUserAccessData";
 
 import "./SignUp.css";
 import { useAppSelector } from "../../app/hooks";
@@ -17,7 +17,7 @@ const SignUp = () => {
   const [error, setError] = useState<string>("");
   const isLoaded = useAppSelector(isLoading);
 
-  const { isLogged, submitSignupForm, validateToken } = useUserCridentials();
+  const { isLogged, submitSignupForm, validateToken } = useUserCredentials();
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {

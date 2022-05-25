@@ -9,10 +9,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // avatar: {
-  //   type: Blob,
-  //   required: false,
-  // },
 
   password: {
     type: String,
@@ -23,20 +19,15 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   rooms: {
-    type: [
-      {
-        message: String,
-        messageType: "user" | "responder",
-      },
-    ],
+    type: mongoose.Schema.Types.Mixed,
     required: false,
   },
   contacts: {
-    type: [String],
+    type: mongoose.Schema.Types.Mixed,
     required: false,
   },
   sessions: {
-    type: [String],
+    type: mongoose.Schema.Types.Mixed,
     required: false,
   },
 });

@@ -3,7 +3,7 @@ const {
   logIn,
   verifyTokenAsync,
   signTokenAsync,
-  findUserByUser,
+  findUserByEmail,
 } = require("../../models/user.model");
 
 require("dotenv").config();
@@ -19,16 +19,25 @@ async function httpSignUp(req, res) {
     });
   }
   const errorMessage = await signUp(user);
-  if (errorMessage) {
+  if (errorMessage.error) {
     return res.status(409).json({
       error: errorMessage.error,
     });
   }
 
-  const token = await signTokenAsync(user.email);
-  return res.status(200).json({
-    token,
-  });
+  try {
+    const token = await signTokenAsync(email);
+
+    return res.status(200).json({
+      token,
+      user: {
+        email,
+        userName,
+      },
+    });
+  } catch (error) {
+    res.status(400).send({ error });
+  }
 }
 
 async function httpLoggin(req, res) {
@@ -60,7 +69,6 @@ async function httpLoggin(req, res) {
 
 async function httpCheckToken(req, res, next) {
   const token = req.body.token;
-  console.log(token);
 
   try {
     const decoded = await verifyTokenAsync(token);
@@ -73,7 +81,7 @@ async function httpCheckToken(req, res, next) {
       if (newToken.error) {
         return res.status(400).send(newToken);
       }
-      const user = await findUserByUser(decoded.email);
+      const user = await findUserByEmail(decoded.email);
       res.send({
         token: newToken,
         user: { userName: user.userName, email: user.email },
