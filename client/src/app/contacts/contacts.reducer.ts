@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { stringify } from "querystring";
 import { RootState } from "../store";
-import { getAllUsers, addContact } from "./contacts.thunks";
+import { getAllUsers, addContact, getContacts } from "./contacts.thunks";
 
 export type User = {
   userName: string;
@@ -24,6 +23,7 @@ const contactsSlice = createSlice({
           return user.email !== JSON.parse(currentUser).email;
         }
       });
+      console.log(action.payload);
       state.isLoading = false;
     });
     builder.addCase(getAllUsers.pending, (state, action) => {
@@ -31,6 +31,10 @@ const contactsSlice = createSlice({
     });
     builder.addCase(addContact.fulfilled, (state, action) => {
       console.log(action.payload);
+    });
+    builder.addCase(getContacts.fulfilled, (state, action) => {
+      console.log(action.payload);
+      state.contacts = action.payload;
     });
   },
 });

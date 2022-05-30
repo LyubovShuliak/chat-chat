@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  avatar: {
+    type: String,
+    required: true,
+  },
   rooms: {
     type: mongoose.Schema.Types.Mixed,
     required: false,

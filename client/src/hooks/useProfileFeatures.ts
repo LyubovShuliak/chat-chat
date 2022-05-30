@@ -2,10 +2,11 @@ import React, { ChangeEvent, useRef, useState } from "react";
 import { ref, uploadBytes } from "@firebase/storage";
 import { storage } from "../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { getAllUsers } from "../app/contacts/contacts.thunks";
-import { contacts } from "../app/contacts/contacts.reducer";
+import { getAllUsers, getContacts } from "../app/contacts/contacts.thunks";
+import { addAvatar } from "../app/user/user.thunks";
 
 const useProfileFeatures = () => {
+  const dispatch = useAppDispatch();
   const [state, setState] = useState({
     left: false,
   });
@@ -18,6 +19,11 @@ const useProfileFeatures = () => {
   };
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => {
+    const currentUser = localStorage.getItem("user");
+    if (currentUser) {
+      dispatch(getContacts(JSON.parse(currentUser).email));
+    }
+
     setOpen(true);
   };
   const handleClose = () => setOpen(false);
@@ -38,7 +44,7 @@ const useProfileFeatures = () => {
     const storageRef = ref(storage, `${email}/avatar.jpg`);
 
     uploadBytes(storageRef, file).then((snapshot) => {
-      console.log("Uploaded a blob or file!");
+      dispatch(addAvatar({ email, avatar: snapshot.metadata.fullPath }));
     });
     const reader = new FileReader();
     reader.onload = () => {

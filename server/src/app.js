@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use("/api", userRouter);
 
-app.use("/api/contacts", contactsRouter);
+app.use("/api/connections", contactsRouter);
 
 app.get("/", (req, res) => {
   res.send(path.join(__dirname, "..", "public", "index.html"));

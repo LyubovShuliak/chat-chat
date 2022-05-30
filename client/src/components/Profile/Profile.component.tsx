@@ -50,7 +50,7 @@ export default function Profile() {
           console.log(error);
         });
     }
-  }, [setUser, user]);
+  });
   return (
     <Box
       sx={{ width: 250 }}

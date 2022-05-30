@@ -1,12 +1,9 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 
 import ContactsIcon from "@mui/icons-material/ContactsRounded";
 
-import useProfileFeatures from "../../hooks/useProfileFeatures";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -22,6 +19,16 @@ import {
 } from "../SearchBar/ChatSearchBar.component";
 import AllRegisteredUsers from "../AllUsers/AllUsersModal.component";
 
+import useProfileFeatures from "../../hooks/useProfileFeatures";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { getAllUsers, addContact } from "../../app/contacts/contacts.thunks";
+import {
+  contacts,
+  isLoading,
+  allUsers,
+  User,
+} from "../../app/contacts/contacts.reducer";
+
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -35,8 +42,8 @@ const style = {
 };
 
 export default function ContactsModal() {
-  const { handleOpen, handleClose, open, focused, addContact } =
-    useProfileFeatures();
+  const { handleOpen, handleClose, open, focused } = useProfileFeatures();
+  const userContacts = useAppSelector(contacts);
 
   return (
     <div>
@@ -80,30 +87,40 @@ export default function ContactsModal() {
           </Search>
 
           <List
-            sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+            sx={{
+              width: "100%",
+              maxWidth: 360,
+              bgcolor: "background.paper",
+              height: "600px",
+              overflowY: "scroll",
+            }}
           >
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-              </ListItemAvatar>
-              <ListItemText primary="Ali Connors" />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-              </ListItemAvatar>
-              <ListItemText primary="Ali Connors" />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-              </ListItemAvatar>
-              <ListItemText primary="Ali Connors" />
-            </ListItem>
+            {userContacts.map((user: User) => {
+              const { id, userName, email } = user;
+              return (
+                <>
+                  <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                      <Avatar
+                        alt={userName}
+                        src="/static/images/avatar/1.jpg"
+                      />
+                    </ListItemAvatar>
+                    <ListItemText primary={userName} />
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                </>
+              );
+            })}
           </List>
-          <Button onClick={handleClose}>Close</Button>
+
+          <Button
+            onClick={handleClose}
+            sx={{ float: "left", marginLeft: "40px" }}
+          >
+            Close
+          </Button>
+
           <AllRegisteredUsers />
         </Box>
       </Modal>

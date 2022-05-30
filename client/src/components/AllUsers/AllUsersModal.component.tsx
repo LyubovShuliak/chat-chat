@@ -48,22 +48,16 @@ export default function AllRegisteredUsers() {
   const [open, setOpen] = useState(false);
 
   const dispatch = useAppDispatch();
-  const userContacts = useAppSelector(contacts);
   const users = useAppSelector(allUsers);
 
   const loading = useAppSelector(isLoading);
 
   const handleClose = () => setOpen(false);
   const handleOpen = () => {
-    dispatch(getAllUsers());
-    setOpen(true);
-  };
-  const addNewContact = (contact: User) => {
-    const currentUser: string = localStorage.getItem("user") || "";
+    const currentUser = localStorage.getItem("user") || "";
     const email = JSON.parse(currentUser).email;
-
-    const data = { user: contact, email };
-    dispatch(addContact(data));
+    dispatch(getAllUsers(email));
+    setOpen(true);
   };
 
   return (

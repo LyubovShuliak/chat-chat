@@ -1,12 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { checkAccesToken, logIn, signUpUser } from "./user.thunks";
+import { checkAccesToken, logIn, signUpUser, addAvatar } from "./user.thunks";
 
 interface Log {
   logStatus: boolean;
   isLoading: boolean;
   errorMesssage: string;
   token: string;
+  avatar: string;
   user: {
     email: string;
     userName: string;
@@ -18,6 +19,7 @@ const initialState: Log = {
   token: "",
   errorMesssage: "",
   isLoading: false,
+  avatar: "",
   user: {
     email: "",
     userName: "",
@@ -97,12 +99,16 @@ const usersSlice = createSlice({
         state.isLoading = false;
       }
     });
+    builder.addCase(addAvatar.fulfilled, (state, action) => {
+      state.avatar = action.payload;
+    });
     builder.addCase(signUpUser.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(logIn.pending, (state) => {
       state.isLoading = true;
     });
+
     builder.addCase(checkAccesToken.pending, (state) => {
       state.isLoading = true;
     });

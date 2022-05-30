@@ -1,22 +1,25 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { User } from "./contacts.reducer";
 
-const API_URL = "http://localhost:3050/api/contacts";
+const API_URL = "http://localhost:3050/api/connections";
 
-const getAllUsers = createAsyncThunk("users/all", async () => {
-  const response = await fetch(`${API_URL}`);
+const getAllUsers = createAsyncThunk("users/all", async (email: string) => {
+  const response = await fetch(`${API_URL}/?email=${email}`);
 
   return response.json();
 });
-const getContacts = createAsyncThunk("users/contacts", async (data: User) => {
-  const response = await fetch(`${API_URL}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  }).then((data) => console.log(data));
-});
+const getContacts = createAsyncThunk(
+  "users/contacts",
+  async (email: string) => {
+    const response = await fetch(`${API_URL}/friends/?email=${email}`, {
+      method: "GET",
+    });
+
+    const result = await response.json();
+
+    return result;
+  }
+);
 const addContact = createAsyncThunk(
   "users/add",
   async (data: { user: User; email: string }) => {
@@ -34,4 +37,4 @@ const addContact = createAsyncThunk(
   }
 );
 
-export { getAllUsers, addContact };
+export { getAllUsers, addContact, getContacts };

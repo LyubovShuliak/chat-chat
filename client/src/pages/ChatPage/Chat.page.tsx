@@ -23,8 +23,8 @@ const ChatPage = () => {
   }, []);
 
   useEffect(() => {
-    // socketApi.auth = { email: user.email };
-    // socketApi.connect();
+    socketApi.auth = { email: user.email };
+    socketApi.connect();
     if (
       !window.performance
         .getEntriesByType("navigation")

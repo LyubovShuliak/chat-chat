@@ -23,7 +23,6 @@ io.on("connection", (socket) => {
 });
 io.use((socket, next) => {
   const email = socket.handshake.auth.email;
-  console.log(email);
 
   if (!email) {
     return next(new Error("invalid username"));

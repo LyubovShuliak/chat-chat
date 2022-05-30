@@ -4,6 +4,7 @@ const {
   verifyTokenAsync,
   signTokenAsync,
   findUserByEmail,
+  addAvatar,
 } = require("../../models/user.model");
 
 require("dotenv").config();
@@ -93,9 +94,17 @@ async function httpCheckToken(req, res, next) {
     return res.status(400).send(error);
   }
 }
+async function httpAddAvatar(req, res) {
+  const { email, avatar } = req.body;
+
+  const user = await addAvatar(email, avatar);
+
+  return res.status(200).json(user);
+}
 
 module.exports = {
   httpSignUp,
   httpLoggin,
   httpCheckToken,
+  httpAddAvatar,
 };

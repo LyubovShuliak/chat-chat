@@ -32,8 +32,10 @@ function useUserCredentials() {
   const isLogged = useAppSelector(logStatus);
 
   useEffect(() => {
-    socketApi.auth = { email: user.email };
-    socketApi.connect();
+    if (user.email) {
+      socketApi.auth = { email: user.email };
+      socketApi.connect();
+    }
   }, [user]);
 
   function navigation() {

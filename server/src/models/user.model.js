@@ -25,12 +25,30 @@ async function signTokenAsync(email) {
     )
   );
 }
+async function addAvatar(email, avatar) {
+  const user = await userDatabase
+    .findOneAndUpdate({ email }, { avatar })
+    .lean();
+  return user;
+}
 
-async function getAllUsers(limit, skip) {
+async function getAllUsers(limit, skip, email) {
+  const userIsContact = (await userDatabase.findOne({ email: email }).lean())
+    .contacts;
+
   const contacts = await userDatabase
-    .find({}, { _id: 0, userName: 1, email: 1, id: 1 })
+    .find({}, { _id: 0, __v: 0 })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean();
+  return contacts.filter(
+    (contact) =>
+      userIsContact.findIndex((user) => user.email === contact.email) === -1
+  );
+}
+async function getContacts(email) {
+  const { contacts } = await userDatabase.findOne({ email: email }).lean();
+
   return contacts;
 }
 
@@ -43,9 +61,7 @@ async function addContact(contact, email) {
     (userContact) => contact.email === userContact.email
   );
 
-  console.log("contactAdded", contactAdded);
-
-  if (contactAdded) return { error: "contact added" };
+  if (contactAdded !== -1) return { error: "contact added" };
   if (!user.contacts.length) {
     const contacts = {
       contacts: [contact],
@@ -92,6 +108,7 @@ async function signUp(user) {
     rooms: [],
     contacts: [],
     sessions: [],
+    avatar: "none",
   };
 
   bcrypt.hash(password, saltRounds, async (err, hash) => {
@@ -124,7 +141,9 @@ async function logIn(user) {
 module.exports = {
   verifyTokenAsync,
   signTokenAsync,
+  addAvatar,
   getAllUsers,
+  getContacts,
   addContact,
   findUserByEmail,
   getUserContacts,

@@ -4,7 +4,6 @@ function socketConnected(socket, io) {
     email: socket.email,
   });
   socket.on("chat message", ({ content, to }) => {
-    console.log(content);
     socket.to(to).emit("private message", {
       content,
       from: socket.id,
