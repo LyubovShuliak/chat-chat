@@ -5,12 +5,9 @@ import Modal from "@mui/material/Modal";
 import ContactsIcon from "@mui/icons-material/ContactsRounded";
 
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
+
 import SearchIcon from "@mui/icons-material/Search";
+import Grid from "@mui/material/Grid";
 
 import {
   StyledInputBase,
@@ -20,14 +17,17 @@ import {
 import AllRegisteredUsers from "../AllUsers/AllUsersModal.component";
 
 import useProfileFeatures from "../../hooks/useProfileFeatures";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { getAllUsers, addContact } from "../../app/contacts/contacts.thunks";
+
 import {
+  allUsers,
   contacts,
   isLoading,
-  allUsers,
   User,
 } from "../../app/contacts/contacts.reducer";
+import { Contact } from "../Contact/Contact.component";
+import { useEffect, useState } from "react";
 
 const style = {
   position: "absolute" as "absolute",
@@ -36,25 +36,42 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: 400,
   bgcolor: "background.paper",
-  border: "2px solid #000",
   boxShadow: 24,
   p: 4,
+  borderRadius: 4,
 };
 
 export default function ContactsModal() {
-  const { handleOpen, handleClose, open, focused } = useProfileFeatures();
+  const { handleOpenContacts, handleCloseContacts, open, focused } =
+    useProfileFeatures();
   const userContacts = useAppSelector(contacts);
+  const dispatch = useAppDispatch();
+  const users = useAppSelector(allUsers);
+
+  const loading = useAppSelector(isLoading);
+
+  const [openAllUsers, setOpenAllUsers] = useState(false);
+  const handleClose = () => {
+    setOpenAllUsers(false);
+  };
+  const handleOpen = () => {
+    const currentUser = localStorage.getItem("user") || "";
+    const email = JSON.parse(currentUser).email;
+    dispatch(getAllUsers(email));
+    setOpenAllUsers(true);
+  };
 
   return (
     <div>
       <Button
-        onClick={handleOpen}
+        onClick={handleOpenContacts}
         sx={{
           backgroundColor: "transparent",
           color: "black",
           display: "flex",
           flexDirection: "row",
           gap: "15px",
+          flexWrap: "wrap",
         }}
       >
         <ContactsIcon style={{ color: "#ff4700", pointerEvents: "none" }} />
@@ -63,12 +80,12 @@ export default function ContactsModal() {
 
       <Modal
         open={open}
-        onClose={handleClose}
+        onClose={handleCloseContacts}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
         disableScrollLock={true}
       >
-        <Box sx={style}>
+        <Box sx={[style, { opacity: openAllUsers ? 0 : 1 }]}>
           <h1>Contacts</h1>
           <Search
             sx={{
@@ -89,39 +106,46 @@ export default function ContactsModal() {
           <List
             sx={{
               width: "100%",
-              maxWidth: 360,
               bgcolor: "background.paper",
               height: "600px",
               overflowY: "scroll",
+              scrollbarWidth: "thin",
+              scrollbarColor: "transparent",
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
             }}
           >
             {userContacts.map((user: User) => {
-              const { id, userName, email } = user;
               return (
-                <>
-                  <ListItem alignItems="flex-start">
-                    <ListItemAvatar>
-                      <Avatar
-                        alt={userName}
-                        src="/static/images/avatar/1.jpg"
-                      />
-                    </ListItemAvatar>
-                    <ListItemText primary={userName} />
-                  </ListItem>
-                  <Divider variant="inset" component="li" />
-                </>
+                <Contact
+                  key={user.id}
+                  handleClose={handleCloseContacts}
+                  user={user}
+                />
               );
             })}
           </List>
 
-          <Button
-            onClick={handleClose}
-            sx={{ float: "left", marginLeft: "40px" }}
+          <Grid
+            container
+            spacing={2}
+            flexDirection={"row"}
+            sx={{ justifyContent: "space-between" }}
           >
-            Close
-          </Button>
-
-          <AllRegisteredUsers />
+            <Grid item xs={4}>
+              <Button onClick={handleCloseContacts}>Close</Button>
+            </Grid>
+            <Grid item xs={4}>
+              <AllRegisteredUsers
+                openAllUsers={openAllUsers}
+                handleClose={handleClose}
+                handleOpen={handleOpen}
+                users={users}
+                loading={loading}
+              />
+            </Grid>
+          </Grid>
         </Box>
       </Modal>
     </div>

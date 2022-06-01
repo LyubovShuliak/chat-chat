@@ -1,4 +1,12 @@
-import { useState, KeyboardEvent, useRef, useEffect, useCallback } from "react";
+import {
+  useState,
+  KeyboardEvent,
+  useRef,
+  useEffect,
+  useCallback,
+  MouseEvent,
+} from "react";
+import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   deletingMessage,
@@ -8,6 +16,7 @@ import {
 import useUserCredentials from "./useUserAccessData";
 
 const useHandleMessages = () => {
+  const { id } = useParams();
   const { socketApi } = useUserCredentials();
 
   const [message, setMessage] = useState<string>("");
@@ -22,8 +31,11 @@ const useHandleMessages = () => {
 
   const sentMessages = useAppSelector(messages);
 
-  function socket(message: string) {
-    socketApi.emit("chat message", message);
+  function socket(content: string, contact: string) {
+    socketApi.emit("private message", {
+      content,
+      to: contact,
+    });
   }
 
   const scrollMessages = () => {
@@ -53,14 +65,24 @@ const useHandleMessages = () => {
       e.preventDefault();
 
       const value = e.currentTarget.innerText;
-
-      socket(value);
+      if (id) {
+        socket(value, id);
+      }
 
       e.currentTarget.innerText = "";
       scrollMessages();
     }
   };
-  const sendOnClick = () => {};
+  const handleInputOnClick = (e: MouseEvent<HTMLButtonElement>) => {
+    const value = newMessage.current!.innerText;
+
+    if (id) {
+      socket(value, id);
+    }
+
+    newMessage.current!.innerText = "";
+    scrollMessages();
+  };
 
   const showEmojiPicker = () => {
     setShowPicker(!showPicker);
@@ -85,6 +107,7 @@ const useHandleMessages = () => {
     deleteMessage,
     handleInputOnEnter,
     setMessage,
+    handleInputOnClick,
     sentMessages,
     messagesContainer,
     newMessage,

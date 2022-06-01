@@ -18,15 +18,22 @@ const useProfileFeatures = () => {
     setFocused(!focused);
   };
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => {
+  const handleOpenContacts = () => {
     const currentUser = localStorage.getItem("user");
     if (currentUser) {
       dispatch(getContacts(JSON.parse(currentUser).email));
     }
 
+    console.log("open");
+
     setOpen(true);
   };
-  const handleClose = () => setOpen(false);
+  const handleCloseContacts = () => {
+    console.log("close");
+
+    setOpen(false);
+    console.log("open", open);
+  };
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -72,8 +79,8 @@ const useProfileFeatures = () => {
   return {
     toggleDrawer,
     focusSearchBar,
-    handleOpen,
-    handleClose,
+    handleOpenContacts,
+    handleCloseContacts,
     handleUploadFile,
     addContact,
     avatar,

@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const userRouter = require("./routes/user/user.router");
 const contactsRouter = require("./routes/contacts/contacts.router");
+const roomsRouter = require("./routes/rooms/rooms.router");
 
 require("dotenv").config();
 
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 app.use("/api", userRouter);
 
 app.use("/api/connections", contactsRouter);
+app.use("/api/rooms", roomsRouter);
 
 app.get("/", (req, res) => {
   res.send(path.join(__dirname, "..", "public", "index.html"));

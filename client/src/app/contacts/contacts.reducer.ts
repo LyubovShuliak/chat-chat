@@ -23,7 +23,6 @@ const contactsSlice = createSlice({
           return user.email !== JSON.parse(currentUser).email;
         }
       });
-      console.log(action.payload);
       state.isLoading = false;
     });
     builder.addCase(getAllUsers.pending, (state, action) => {
@@ -33,7 +32,6 @@ const contactsSlice = createSlice({
       console.log(action.payload);
     });
     builder.addCase(getContacts.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.contacts = action.payload;
     });
   },

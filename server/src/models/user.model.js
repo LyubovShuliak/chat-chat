@@ -37,7 +37,10 @@ async function getAllUsers(limit, skip, email) {
     .contacts;
 
   const contacts = await userDatabase
-    .find({}, { _id: 0, __v: 0 })
+    .find(
+      {},
+      { _id: 0, __v: 0, password: 0, rooms: 0, contacts: 0, sessions: 0 }
+    )
     .skip(skip)
     .limit(limit)
     .lean();

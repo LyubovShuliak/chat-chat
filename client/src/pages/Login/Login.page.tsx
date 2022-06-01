@@ -19,7 +19,7 @@ const Login = () => {
 
   const isLoaded = useAppSelector(isLoading);
 
-  const { submitLogInForm, isLogged } = useUserCredentials();
+  const { submitLogInForm, isLogged, validateToken } = useUserCredentials();
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -31,7 +31,6 @@ const Login = () => {
     },
     [error, setError, submitLogInForm]
   );
-  const { validateToken } = useUserCredentials();
 
   useEffect(() => {
     validateToken();

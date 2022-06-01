@@ -1,0 +1,11 @@
+.missed_messages_viget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgb(7, 160, 248);
+  color: white;
+}

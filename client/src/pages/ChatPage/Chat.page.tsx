@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import Messages from "../../components/Messages/Messages.component";
-import SendMessage from "../../components/SendMessage/SendMessage.conponent";
+import SendMessage from "../../components/SendMessage/SendMessage.component";
 import Chats from "../../components/Chats/Chats.component";
 
 import useUserCredentials from "../../hooks/useUserAccessData";
@@ -15,6 +15,8 @@ const ChatPage = () => {
   const { sendMessage, setMessage } = useHandleMessages();
 
   const navigation = useNavigate();
+  const { id } = useParams();
+
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
@@ -52,11 +54,12 @@ const ChatPage = () => {
   return (
     <div className={styles.messages_container}>
       <Chats />
-
-      <div className={styles.messages_block}>
-        <Messages />
-        <SendMessage />
-      </div>
+      {id ? (
+        <div className={styles.messages_block}>
+          <Messages />
+          <SendMessage />
+        </div>
+      ) : null}
     </div>
   );
 };

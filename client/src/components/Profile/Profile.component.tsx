@@ -26,6 +26,7 @@ import useUserCredentials from "../../hooks/useUserAccessData";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 import profile from "./profile.module.css";
+import path from "path";
 
 export default function Profile() {
   const [changeAvatar, setAvatar] = useState(false);
@@ -50,7 +51,7 @@ export default function Profile() {
           console.log(error);
         });
     }
-  });
+  }, [user]);
   return (
     <Box
       sx={{ width: 250 }}
@@ -75,6 +76,7 @@ export default function Profile() {
         <LogoutIcon />
         Log out
       </Link>
+
       <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
         <ListItem
           alignItems="flex-start"

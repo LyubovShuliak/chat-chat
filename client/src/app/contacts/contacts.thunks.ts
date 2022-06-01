@@ -5,8 +5,8 @@ const API_URL = "http://localhost:3050/api/connections";
 
 const getAllUsers = createAsyncThunk("users/all", async (email: string) => {
   const response = await fetch(`${API_URL}/?email=${email}`);
-
-  return response.json();
+  const data = await response.json();
+  return data;
 });
 const getContacts = createAsyncThunk(
   "users/contacts",

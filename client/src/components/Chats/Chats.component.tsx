@@ -1,47 +1,47 @@
-import * as React from "react";
+import { useEffect } from "react";
 
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import Divider from "@mui/material/Divider";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
 
 import ChatSearchBar from "../SearchBar/ChatSearchBar.component";
 
 import styles from "./chats.module.css";
 import { SimpleSlider } from "../Carousel/Carousel.component";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { rooms } from "../../app/rooms/rooms.reducer";
+import { getChats } from "../../app/rooms/rooms.thunks";
+import { ChatItem } from "../ChatItem/ChatItem.component";
+import { Link } from "react-router-dom";
 
 export default function Chats() {
+  const chats = useAppSelector(rooms);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      dispatch(getChats(JSON.parse(user).email));
+    }
+  }, []);
+
   return (
     <div className={styles.chat_block}>
       <ChatSearchBar />
 
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-        <Divider variant="inset" component="li" />
-        <ListItem alignItems="flex-start" style={{ boxSizing: "border-box" }}>
-          <ListItemAvatar>
-            <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-          </ListItemAvatar>
-          <ListItemText
-            primary={
-              <React.Fragment>
-                <Typography
-                  sx={{ display: "block" }}
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
+        {chats.length
+          ? chats.map((chat) => {
+              return (
+                <Link
+                  key={chat[1].chatData.id}
+                  to={{
+                    pathname: `/${chat[1].chatData.id}`,
+                  }}
                 >
-                  Sandra Adams
-                </Typography>
-              </React.Fragment>
-            }
-            secondary={"Wish I could come, but I'm out of town this…"}
-          />
-          <div className={styles.missed_messages_viget}>6</div>
-        </ListItem>
-        <Divider variant="inset" component="li" />
+                  <ChatItem {...chat[1].chatData} />
+                </Link>
+              );
+            })
+          : null}
       </List>
     </div>
   );

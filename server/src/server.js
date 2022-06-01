@@ -27,6 +27,7 @@ io.use((socket, next) => {
   if (!email) {
     return next(new Error("invalid username"));
   }
+  console.log(email);
   socket.email = email;
   next();
 });

@@ -12,7 +12,7 @@ import useUserAccessData from "../../hooks/useUserAccessData";
 const SendMessage = () => {
   const {
     onEmojiClick,
-
+    handleInputOnClick,
     showEmojiPicker,
     handleInputOnEnter,
 
@@ -66,7 +66,10 @@ const SendMessage = () => {
           <PickEmoji style={{ width: "40px" }} />
         </button>
 
-        <button className={messageInputStyles.sendBtn}>
+        <button
+          className={messageInputStyles.sendBtn}
+          onClick={(e) => handleInputOnClick(e)}
+        >
           <SendIcon
             style={{
               width: "30px",
