@@ -5,12 +5,12 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import ChatIcon from "@mui/icons-material/Chat";
 import DeleteContact from "@mui/icons-material/Delete";
-import { contacts, User } from "../../app/contacts/contacts.reducer";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { contacts, User } from "../../../app/contacts/contacts.reducer";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import Button from "@mui/material/Button";
-import { addChat, getChats } from "../../app/rooms/rooms.thunks";
+import { addChat, getChats } from "../../../app/rooms/rooms.thunks";
 import { useSelector } from "react-redux";
-import { rooms } from "../../app/rooms/rooms.reducer";
+import { rooms } from "../../../app/rooms/rooms.reducer";
 import { useNavigate } from "react-router-dom";
 
 const Contact = (props: { user: User; handleClose: () => void }) => {

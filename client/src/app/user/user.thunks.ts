@@ -16,7 +16,6 @@ const signUpUser = createAsyncThunk("signup", async (data: User) => {
     body: JSON.stringify(data),
   });
 
-  console.log(response);
   const result = await response.json();
 
   return result;

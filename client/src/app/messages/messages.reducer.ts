@@ -22,12 +22,8 @@ const messagesSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
-    sendingMessage: (state, action: PayloadAction<{ message: string }>) => {
-      state.test.push({
-        message: action.payload.message,
-        id: uuid4(),
-        messageType: "user",
-      });
+    sendingMessage: (state, action) => {
+      state = { ...state, ...action.payload };
     },
     deletingMessage: (state, action) => {
       state.test = state.test.filter((mes) => mes.id === action.payload);

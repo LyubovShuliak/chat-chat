@@ -1,3 +1,4 @@
+import { connect } from "http2";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
@@ -9,20 +10,18 @@ import {
   signUpUser,
   User,
 } from "../app/user/user.thunks";
-
-import { io } from "socket.io-client";
-const url = "http://localhost:3050/";
-const socketApi = io(url, {
-  autoConnect: false,
-});
+import { useSocket } from "./socket";
 
 function useUserCredentials() {
+  const { connect } = useSocket();
   const [user, setUser] = useState<{
     email: string;
     userName: string;
+    id: string;
   }>({
     email: "",
     userName: "",
+    id: "",
   });
 
   const dispatch = useAppDispatch();
@@ -32,9 +31,8 @@ function useUserCredentials() {
   const isLogged = useAppSelector(logStatus);
 
   useEffect(() => {
-    if (user.email) {
-      socketApi.auth = { email: user.email };
-      socketApi.connect();
+    if (user.id) {
+      connect(user.id);
     }
   }, [user]);
 
@@ -52,7 +50,6 @@ function useUserCredentials() {
     if (store.getState().user.logStatus) {
       return navigate("/", { replace: true });
     } else {
-      socketApi.disconnect();
       return navigate("/login", { replace: true });
     }
   }, []);
@@ -79,7 +76,6 @@ function useUserCredentials() {
         if (!errorMesssage) {
           navigation();
         } else {
-          socketApi.disconnect();
           return errorMesssage;
         }
       }
@@ -114,7 +110,6 @@ function useUserCredentials() {
 
   function signOut() {
     dispatch(signOutUser());
-    socketApi.disconnect();
   }
 
   return {
@@ -126,7 +121,6 @@ function useUserCredentials() {
     user,
     setUser,
     isLogged,
-    socketApi,
   };
 }
 

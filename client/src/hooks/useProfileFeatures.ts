@@ -24,15 +24,10 @@ const useProfileFeatures = () => {
       dispatch(getContacts(JSON.parse(currentUser).email));
     }
 
-    console.log("open");
-
     setOpen(true);
   };
   const handleCloseContacts = () => {
-    console.log("close");
-
     setOpen(false);
-    console.log("open", open);
   };
 
   const toggleDrawer =

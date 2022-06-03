@@ -1,13 +1,11 @@
-import { useEffect, useState } from "react";
 import { Message } from "../../app/messages/messages.reducer";
-import useHandleMessages from "../../hooks/handleMessages";
+import { useHandleMessages } from "../../hooks/handleMessages";
 
 import MessageListItem from "../Message/MessageListItem.component";
 
 import styles from "./messages.module.css";
 const Messages = () => {
-  const { messagesContainer, sentMessages, sendMessage, setMessage } =
-    useHandleMessages();
+  const { messagesContainer, sentMessages } = useHandleMessages();
 
   return (
     <div className={styles.messages_container}>

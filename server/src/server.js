@@ -1,11 +1,13 @@
 const http = require("http");
 
 const { Server } = require("socket.io");
+const { v4: uuidv4 } = require("uuid");
 
 const open = require("open");
 
 const { mongoConnect } = require("./services/mongo");
 const { socketConnected } = require("./services/socket.service");
+const userDatabase = require("./models/user.mongo");
 
 require("dotenv").config();
 
@@ -18,17 +20,15 @@ const io = new Server(server, {
   cors: "*",
 });
 
-io.on("connection", (socket) => {
-  socketConnected(socket, io);
+io.on("connection", async (socket) => {
+  await socketConnected(socket, io);
 });
 io.use((socket, next) => {
-  const email = socket.handshake.auth.email;
-
-  if (!email) {
+  const userID = socket.handshake.auth.userID;
+  if (!userID) {
     return next(new Error("invalid username"));
   }
-  console.log(email);
-  socket.email = email;
+  socket.userID = userID;
   next();
 });
 

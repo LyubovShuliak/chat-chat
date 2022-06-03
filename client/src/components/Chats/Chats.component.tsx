@@ -11,6 +11,7 @@ import { rooms } from "../../app/rooms/rooms.reducer";
 import { getChats } from "../../app/rooms/rooms.thunks";
 import { ChatItem } from "../ChatItem/ChatItem.component";
 import { Link } from "react-router-dom";
+import { JsxEmit } from "typescript";
 
 export default function Chats() {
   const chats = useAppSelector(rooms);
@@ -18,6 +19,8 @@ export default function Chats() {
 
   useEffect(() => {
     const user = localStorage.getItem("user");
+    chats.length === 0 ? console.log("fiuu") : console.log("uhoo");
+
     if (user) {
       dispatch(getChats(JSON.parse(user).email));
     }
@@ -28,7 +31,7 @@ export default function Chats() {
       <ChatSearchBar />
 
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-        {chats.length
+        {/* {chats.length !== 0
           ? chats.map((chat) => {
               return (
                 <Link
@@ -41,7 +44,7 @@ export default function Chats() {
                 </Link>
               );
             })
-          : null}
+          : null} */}
       </List>
     </div>
   );

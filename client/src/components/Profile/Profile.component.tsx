@@ -19,7 +19,7 @@ import Typography from "@mui/material/Typography";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { InputLabel } from "@mui/material";
 
-import ContactsModal from "../Contacts/Contacts.modal.component";
+import ContactsModal from "../modals_components/Contacts/Contacts.modal.component";
 
 import useProfileFeatures from "../../hooks/useProfileFeatures";
 import useUserCredentials from "../../hooks/useUserAccessData";

@@ -10,9 +10,10 @@ import { Link } from "react-router-dom";
 import useUserCredentials from "../../hooks/useUserAccessData";
 
 import "./SignUp.css";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { checkIsLoged, isLoading } from "../../app/user/user.reducer";
 import Spinner from "../../components/spiner/Spiner.component";
+import { signUpUser } from "../../app/user/user.thunks";
 const SignUp = () => {
   const [error, setError] = useState<string>("");
   const isLoaded = useAppSelector(isLoading);
@@ -33,6 +34,21 @@ const SignUp = () => {
   useLayoutEffect(() => {
     validateToken();
   }, []);
+
+  const dispatch = useAppDispatch();
+
+  // useEffect(() => {
+  //   const array = ["sender", "receiver", "another"];
+
+  //   array.forEach((item) => {
+  //     const newUser = {
+  //       email: `${item}@gmail.com`,
+  //       userName: `${item}`,
+  //       password: `${item}123`,
+  //     };
+  //     dispatch(signUpUser(newUser));
+  //   });
+  // }, []);
 
   return isLoaded && isLogged ? null : (
     <form className="signup_form" method="post" onSubmit={handleSubmit}>

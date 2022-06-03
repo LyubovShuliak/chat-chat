@@ -13,19 +13,23 @@ import {
   StyledInputBase,
   Search,
   SearchIconWrapper,
-} from "../SearchBar/ChatSearchBar.component";
+} from "../../SearchBar/ChatSearchBar.component";
 import AllRegisteredUsers from "../AllUsers/AllUsersModal.component";
 
-import useProfileFeatures from "../../hooks/useProfileFeatures";
-import { useAppSelector, useAppDispatch } from "../../app/hooks";
-import { getAllUsers, addContact } from "../../app/contacts/contacts.thunks";
+import useProfileFeatures from "../../../hooks/useProfileFeatures";
+import { useAppSelector, useAppDispatch } from "../../../app/hooks";
+import {
+  getAllUsers,
+  addContact,
+  getContacts,
+} from "../../../app/contacts/contacts.thunks";
 
 import {
   allUsers,
   contacts,
   isLoading,
   User,
-} from "../../app/contacts/contacts.reducer";
+} from "../../../app/contacts/contacts.reducer";
 import { Contact } from "../Contact/Contact.component";
 import { useEffect, useState } from "react";
 
@@ -52,6 +56,9 @@ export default function ContactsModal() {
 
   const [openAllUsers, setOpenAllUsers] = useState(false);
   const handleClose = () => {
+    const currentUser = localStorage.getItem("user") || "";
+    const email = JSON.parse(currentUser).email;
+    dispatch(getContacts(email));
     setOpenAllUsers(false);
   };
   const handleOpen = () => {
@@ -60,6 +67,9 @@ export default function ContactsModal() {
     dispatch(getAllUsers(email));
     setOpenAllUsers(true);
   };
+  useEffect(() => {
+    console.log("userContacts", userContacts);
+  }, [userContacts]);
 
   return (
     <div>

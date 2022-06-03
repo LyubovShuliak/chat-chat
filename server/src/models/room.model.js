@@ -27,7 +27,7 @@ async function getChats(email) {
   const user = await userDatabase
     .findOne({ email: email }, { __v: 0, _id: 0 })
     .lean();
-  const rooms = new Map(Object.entries(user.rooms));
+  const rooms = new Map(Object.entries(user).rooms);
   return rooms;
 }
 async function removeChat(email, chat) {

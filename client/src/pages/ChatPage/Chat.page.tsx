@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import Messages from "../../components/Messages/Messages.component";
 import SendMessage from "../../components/SendMessage/SendMessage.component";
@@ -7,14 +7,17 @@ import Chats from "../../components/Chats/Chats.component";
 
 import useUserCredentials from "../../hooks/useUserAccessData";
 
-import useHandleMessages from "../../hooks/handleMessages";
 import styles from "./chat_page.module.css";
+import { useAppDispatch } from "../../app/hooks";
+import { useSocket } from "../../hooks/socket";
 
 const ChatPage = () => {
-  const { user, isLogged, socketApi, setUser } = useUserCredentials();
-  const { sendMessage, setMessage } = useHandleMessages();
+  const { user, isLogged, setUser } = useUserCredentials();
+  const { handleDisconnect, messageListener, socketEventListener } =
+    useSocket();
 
   const navigation = useNavigate();
+  // const dispatch = useAppDispatch();
   const { id } = useParams();
 
   useEffect(() => {
@@ -22,11 +25,14 @@ const ChatPage = () => {
     if (user) {
       setUser(JSON.parse(user));
     }
-  }, []);
+  }, [setUser]);
+  useEffect(() => {
+    socketEventListener();
+  }, [socketEventListener]);
 
   useEffect(() => {
-    socketApi.auth = { email: user.email };
-    socketApi.connect();
+    messageListener();
+
     if (
       !window.performance
         .getEntriesByType("navigation")
@@ -39,17 +45,8 @@ const ChatPage = () => {
   }, [user]);
 
   useEffect(() => {
-    socketApi.on("disconnect", () => {
-      socketApi.connect();
-      socketApi.auth = { email: user.email };
-    });
+    handleDisconnect(user.id);
   });
-  useEffect(() => {
-    socketApi.on("chat message", ({ content, from }) => {
-      setMessage(content);
-      sendMessage(content);
-    });
-  }, []);
 
   return (
     <div className={styles.messages_container}>

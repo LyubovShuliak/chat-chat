@@ -6,7 +6,7 @@ import AttachFile from "@mui/icons-material/AttachFile";
 
 import messageInputStyles from "./sendMessage.module.css";
 
-import useHandleMessages from "../../hooks/handleMessages";
+import { useHandleMessages } from "../../hooks/handleMessages";
 import useUserAccessData from "../../hooks/useUserAccessData";
 
 const SendMessage = () => {
@@ -19,7 +19,6 @@ const SendMessage = () => {
     newMessage,
     showPicker,
   } = useHandleMessages();
-  const { socketApi } = useUserAccessData();
 
   return (
     <div className={messageInputStyles.container}>

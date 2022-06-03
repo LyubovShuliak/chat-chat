@@ -13,24 +13,24 @@ import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import SearchIcon from "@mui/icons-material/Search";
 
-import useProfileFeatures from "../../hooks/useProfileFeatures";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { getAllUsers, addContact } from "../../app/contacts/contacts.thunks";
+import useProfileFeatures from "../../../hooks/useProfileFeatures";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { getAllUsers, addContact } from "../../../app/contacts/contacts.thunks";
 import {
   contacts,
   isLoading,
   allUsers,
   User,
-} from "../../app/contacts/contacts.reducer";
+} from "../../../app/contacts/contacts.reducer";
 
 import {
   StyledInputBase,
   Search,
   SearchIconWrapper,
-} from "../SearchBar/ChatSearchBar.component";
+} from "../../SearchBar/ChatSearchBar.component";
 
 import styles from "./profile.module.css";
-import CustomButton from "../Button/Button.component";
+import CustomButton from "../../Button/Button.component";
 
 const style = {
   position: "absolute" as "absolute",
@@ -53,9 +53,6 @@ export default function AllRegisteredUsers(props: {
   const [focused, setFocused] = useState(false);
   const { users, openAllUsers, handleClose, handleOpen, loading } = props;
 
-  useEffect(() => {
-    users.forEach((user) => console.log(user));
-  }, [users]);
   return (
     <>
       <Button

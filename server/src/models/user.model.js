@@ -125,7 +125,7 @@ async function signUp(user) {
       console.error(err);
     }
   });
-  return { userName: newUser.userName, email: newUser.email };
+  return { userName: newUser.userName, email: newUser.email, id: newUser.id };
 }
 
 async function logIn(user) {
@@ -138,7 +138,11 @@ async function logIn(user) {
   }
 
   await bcrypt.compare(password, userPassword.password);
-  return { userName: userPassword.userName, email: userPassword.email };
+  return {
+    userName: userPassword.userName,
+    email: userPassword.email,
+    id: userPassword.id,
+  };
 }
 
 module.exports = {
