@@ -7,43 +7,72 @@ import ChatSearchBar from "../SearchBar/ChatSearchBar.component";
 import styles from "./chats.module.css";
 import { SimpleSlider } from "../Carousel/Carousel.component";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { rooms } from "../../app/rooms/rooms.reducer";
-import { getChats } from "../../app/rooms/rooms.thunks";
+
 import { ChatItem } from "../ChatItem/ChatItem.component";
 import { Link } from "react-router-dom";
-import { JsxEmit } from "typescript";
+import { socketApi, useSocket } from "../../hooks/socket";
+import { rooms, setChats } from "../../app/rooms/rooms.reducer";
+import { contacts } from "../../app/contacts/contacts.reducer";
+import { getContacts } from "../../app/contacts/contacts.thunks";
+import { User } from "../../app/contacts/contacts.reducer";
 
 export default function Chats() {
-  const chats = useAppSelector(rooms);
   const dispatch = useAppDispatch();
+  const userChats = useAppSelector(rooms);
+  const userContacts = useAppSelector(contacts);
 
+  const { getContactsStatus } = useSocket();
   useEffect(() => {
     const user = localStorage.getItem("user");
-    chats.length === 0 ? console.log("fiuu") : console.log("uhoo");
 
     if (user) {
-      dispatch(getChats(JSON.parse(user).email));
+      getContactsStatus();
     }
   }, []);
+
+  useEffect(() => {
+    socketApi.on("chats", (chats) => {
+      dispatch(setChats(chats));
+    });
+  });
+
+  useEffect(() => {
+    const currentUser = localStorage.getItem("user") || "";
+    const email = JSON.parse(currentUser).email;
+
+    if (email) {
+      dispatch(getContacts(email));
+    }
+  }, []);
+  useEffect(() => {
+    console.log("userContacts", userContacts);
+    console.log("userChats", userChats);
+    if (userChats) {
+      console.log("Object.values(userChats)", ...Object.values(userChats));
+    }
+  }, [userContacts, userChats]);
 
   return (
     <div className={styles.chat_block}>
       <ChatSearchBar />
 
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-        {/* {chats.length !== 0
-          ? chats.map((chat) => {
-              return (
-                <Link
-                  key={chat[1].chatData.id}
-                  to={{
-                    pathname: `/${chat[1].chatData.id}`,
-                  }}
-                >
-                  <ChatItem {...chat[1].chatData} />
-                </Link>
-              );
-            })
+        {/* {Object.keys(userChats).length !== 0 && userContacts.length !== 0
+          ? Object.values(userChats)
+              .flat(1)
+              .map((chat, i, arr) => {
+                if()
+                return (
+                  <Link
+                    key={chat.user.id}
+                    to={{
+                      pathname: `/${chat.user.id}`,
+                    }}
+                  >
+                    <ChatItem {...chat.user} />
+                  </Link>
+                );
+              })
           : null} */}
       </List>
     </div>

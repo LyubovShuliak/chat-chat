@@ -12,7 +12,7 @@ import { useAppDispatch } from "../../app/hooks";
 import { useSocket } from "../../hooks/socket";
 
 const ChatPage = () => {
-  const { user, isLogged, setUser } = useUserCredentials();
+  const { user, isLogged, setUser, loading } = useUserCredentials();
   const { handleDisconnect, messageListener, socketEventListener } =
     useSocket();
 
@@ -31,18 +31,23 @@ const ChatPage = () => {
   }, [socketEventListener]);
 
   useEffect(() => {
-    messageListener();
-
-    if (
-      !window.performance
-        .getEntriesByType("navigation")
-        .map((nav: any) => nav.type)
-        .includes("reload") &&
-      !isLogged
-    ) {
+    if (!isLogged && !localStorage.getItem("user")) {
       navigation("/signup", { replace: true });
     }
+
+    if (
+      window.performance
+        .getEntriesByType("navigation")
+        .map((nav: any) => nav.type)
+        .includes("reload")
+    ) {
+      console.log("reload");
+    }
   }, [user]);
+
+  useEffect(() => {
+    messageListener();
+  }, []);
 
   useEffect(() => {
     handleDisconnect(user.id);

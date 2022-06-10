@@ -83,6 +83,11 @@ async function addContact(contact, email) {
 async function findUserByEmail(email) {
   return await userDatabase.findOne({ email: email });
 }
+async function findUserByID(id) {
+  return await userDatabase
+    .findOne({ id: id }, { __v: 0, _id: 0, contacts: 0, password: 0 })
+    .lean();
+}
 async function getUserContacts(email) {
   return await userDatabase.findOne({ email: email }, "contacts");
 }
@@ -108,7 +113,6 @@ async function signUp(user) {
   const newUser = {
     ...user,
     id: uuidv4(),
-    rooms: [],
     contacts: [],
     sessions: [],
     avatar: "none",
@@ -153,6 +157,7 @@ module.exports = {
   getContacts,
   addContact,
   findUserByEmail,
+  findUserByID,
   getUserContacts,
   findBySearchQuery,
   signUp,

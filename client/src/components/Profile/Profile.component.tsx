@@ -43,12 +43,20 @@ export default function Profile() {
     const storage = getStorage();
     if (user.email) {
       const pathReference = ref(storage, `${user.email}/avatar.jpg`);
+      console.log(pathReference);
+
       getDownloadURL(pathReference)
-        .then((url) => {
-          avatar.current.src = url;
-        })
         .catch((error) => {
-          console.log(error);
+          if (error === "storage/object-not-found") {
+            avatar.current.src = "";
+          }
+        })
+        .then((url) => {
+          if (url) {
+            avatar.current.src = url;
+          } else {
+            return;
+          }
         });
     }
   }, [user]);

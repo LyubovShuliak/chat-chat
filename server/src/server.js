@@ -28,16 +28,18 @@ io.use((socket, next) => {
   if (!userID) {
     return next(new Error("invalid username"));
   }
+  console.log(`${userID} connected`);
   socket.userID = userID;
   next();
 });
 
 function startServer() {
-  mongoConnect(io);
+  mongoConnect();
   server.listen(PORT, () => {
     console.log(`Listening to the port ${PORT}`);
     // open(`http://localhost:${PORT}/`);
   });
+  console.clear();
 }
 
 startServer();

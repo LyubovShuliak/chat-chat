@@ -1,18 +1,18 @@
 import { FC } from "react";
-import { Message } from "../../app/messages/messages.reducer";
 import styles from "./message.module.css";
 
 import MessageRead from "@mui/icons-material/DoneAll";
 import DoneIcon from "@mui/icons-material/Done";
+import { Message } from "../../app/rooms/rooms.reducer";
 
-const MessageListItem: FC<Message> = (props) => {
-  const { message, messageType, id } = props;
+const MessageListItem = (props: Message) => {
+  const { message, type } = props;
   const now = new Date();
   const current = now.getHours() + ":" + now.getMinutes();
 
   return (
     <div>
-      <div className={styles[messageType]}>
+      <div className={styles[type]}>
         <p className={styles.message_text}>{message}</p>
 
         <div className={styles.messageInformation}>

@@ -7,8 +7,9 @@ import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import styles from "./chatItem.module.css";
 import { User } from "../../app/contacts/contacts.reducer";
+import { ChatData } from "../../app/rooms/rooms.reducer";
 
-const ChatItem = (props: User) => {
+const ChatItem = (props: ChatData) => {
   const { userName, email, id } = props;
   return (
     <>

@@ -37,20 +37,20 @@ const SignUp = () => {
 
   const dispatch = useAppDispatch();
 
-  // useEffect(() => {
-  //   const array = ["sender", "receiver", "another"];
+  useEffect(() => {
+    const array = ["sender", "receiver", "another"];
 
-  //   array.forEach((item) => {
-  //     const newUser = {
-  //       email: `${item}@gmail.com`,
-  //       userName: `${item}`,
-  //       password: `${item}123`,
-  //     };
-  //     dispatch(signUpUser(newUser));
-  //   });
-  // }, []);
+    array.forEach((item) => {
+      const newUser = {
+        email: `${item}@gmail.com`,
+        userName: `${item}`,
+        password: `${item}123`,
+      };
+      dispatch(signUpUser(newUser));
+    });
+  }, []);
 
-  return isLoaded && isLogged ? null : (
+  return isLogged && !isLoaded ? null : (
     <form className="signup_form" method="post" onSubmit={handleSubmit}>
       <h1 className="greating">Create account</h1>
       <Link

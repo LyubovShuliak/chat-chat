@@ -8,9 +8,8 @@ import DeleteContact from "@mui/icons-material/Delete";
 import { contacts, User } from "../../../app/contacts/contacts.reducer";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import Button from "@mui/material/Button";
-import { addChat, getChats } from "../../../app/rooms/rooms.thunks";
 import { useSelector } from "react-redux";
-import { rooms } from "../../../app/rooms/rooms.reducer";
+
 import { useNavigate } from "react-router-dom";
 
 const Contact = (props: { user: User; handleClose: () => void }) => {
@@ -21,12 +20,6 @@ const Contact = (props: { user: User; handleClose: () => void }) => {
   const createChat = () => {
     const currentUser = localStorage.getItem("user");
     if (currentUser) {
-      dispatch(
-        addChat({
-          email: JSON.parse(currentUser)!.email,
-          chat: props.user,
-        })
-      );
       props.handleClose();
       navigate(`/${id}`, { replace: true });
     }

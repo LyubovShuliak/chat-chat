@@ -44,10 +44,13 @@ const useProfileFeatures = () => {
     };
   function previewFile(file: any, email: string) {
     const storageRef = ref(storage, `${email}/avatar.jpg`);
+    console.log(storageRef);
 
-    uploadBytes(storageRef, file).then((snapshot) => {
-      dispatch(addAvatar({ email, avatar: snapshot.metadata.fullPath }));
-    });
+    uploadBytes(storageRef, file)
+      .then((snapshot) => {
+        dispatch(addAvatar({ email, avatar: snapshot.metadata.fullPath }));
+      })
+      .catch(console.log);
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {

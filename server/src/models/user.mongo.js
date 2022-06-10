@@ -22,10 +22,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  rooms: {
-    type: mongoose.Schema.Types.Mixed,
-    required: false,
-  },
+
   contacts: {
     type: mongoose.Schema.Types.Mixed,
     required: false,

@@ -3,9 +3,11 @@ import { RootState } from "../store";
 import { getAllUsers, addContact, getContacts } from "./contacts.thunks";
 
 export type User = {
-  userName: string;
+  avatar: string;
   email: string;
   id: string;
+  userName: string;
+  connected: boolean;
 };
 
 type Contacts = { contacts: User[]; isLoading: boolean; allUsers: User[] };
@@ -14,7 +16,14 @@ const initialState: Contacts = { contacts: [], allUsers: [], isLoading: false };
 const contactsSlice = createSlice({
   name: "contacts",
   initialState,
-  reducers: {},
+  reducers: {
+    connection: (state, action) => {
+      const user = state.contacts.find((u) => u.id === action.payload);
+      if (user) {
+        user.connected = true;
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getAllUsers.fulfilled, (state, action) => {
       state.allUsers = action.payload.filter((user: User) => {
@@ -32,10 +41,15 @@ const contactsSlice = createSlice({
       console.log(action.payload);
     });
     builder.addCase(getContacts.fulfilled, (state, action) => {
-      state.contacts = action.payload;
+      state.contacts = action.payload.map((user: User) => ({
+        ...user,
+        connected: false,
+      }));
     });
   },
 });
+
+export const { connection } = contactsSlice.actions;
 
 export const contacts = (state: RootState) => state.contacts.contacts;
 export const allUsers = (state: RootState) => state.contacts.allUsers;

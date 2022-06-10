@@ -8,11 +8,6 @@ import {
 } from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  deletingMessage,
-  messages,
-  sendingMessage,
-} from "../app/messages/messages.reducer";
 import { useSocket } from "./socket";
 
 const useHandleMessages = () => {
@@ -28,7 +23,7 @@ const useHandleMessages = () => {
 
   const dispatch = useAppDispatch();
 
-  const sentMessages = useAppSelector(messages);
+  // const sentMessages = useAppSelector(messages);
 
   const scrollMessages = useCallback(() => {
     const messagesScroll = messagesContainer.current;
@@ -79,18 +74,16 @@ const useHandleMessages = () => {
     setShowPicker(!showPicker);
   }, []);
 
-  const deleteMessage = useCallback((id: string) => {
-    dispatch(deletingMessage(id));
-  }, []);
+  // const deleteMessage = useCallback((id: string) => {
+  //   dispatch(deletingMessage(id));
+  // }, []);
   return {
     onEmojiClick,
 
     showEmojiPicker,
-    deleteMessage,
     handleInputOnEnter,
 
     handleInputOnClick,
-    sentMessages,
     messagesContainer,
     newMessage,
     showPicker,

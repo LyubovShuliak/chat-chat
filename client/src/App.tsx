@@ -5,8 +5,8 @@ import Login from "./pages/Login/Login.page";
 import SignUp from "./pages/SignUp/SignUp.component";
 import ChatPage from "./pages/ChatPage/Chat.page";
 import { useEffect } from "react";
-import { useAppDispatch } from "./app/hooks";
-import { signUpUser } from "./app/user/user.thunks";
+
+import { useSocket } from "./hooks/socket";
 
 function App() {
   return (

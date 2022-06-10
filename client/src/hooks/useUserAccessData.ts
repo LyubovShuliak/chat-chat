@@ -3,7 +3,12 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { store } from "../app/store";
-import { error, logStatus, signOutUser } from "../app/user/user.reducer";
+import {
+  error,
+  isLoading,
+  logStatus,
+  signOutUser,
+} from "../app/user/user.reducer";
 import {
   checkAccesToken,
   logIn,
@@ -29,6 +34,7 @@ function useUserCredentials() {
 
   const errorMesssage = useAppSelector(error);
   const isLogged = useAppSelector(logStatus);
+  const loading = useAppSelector(isLoading);
 
   useEffect(() => {
     if (user.id) {
@@ -121,6 +127,7 @@ function useUserCredentials() {
     user,
     setUser,
     isLogged,
+    loading,
   };
 }
 
