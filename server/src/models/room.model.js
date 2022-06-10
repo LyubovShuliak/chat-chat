@@ -18,16 +18,18 @@ async function findSession(id) {
 }
 
 async function saveMessage(session, id, responder, message) {
-  const messages = [...session.messages[responder], message];
-
   if (session) {
+    const oldMessages = session.messages[responder]
+      ? session.messages[responder]
+      : [];
+    const messages = [...oldMessages, message];
     await sessions.updateOne(
       { id: id },
       { $set: { messages: { [responder]: messages } } }
     );
   } else {
     const receivedMessage = { [responder]: [message] };
-    await sessions.insertMany([{ id: to, messages: receivedMessage }]);
+    await sessions.insertMany([{ id: id, messages: receivedMessage }]);
   }
 }
 

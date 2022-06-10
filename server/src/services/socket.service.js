@@ -19,7 +19,7 @@ async function socketConnected(socket, io) {
     users[socket.userID] = id;
   }
   const messages = (await findSession(socket.userID)) || [];
-  const userChats = (await getSessions(socket.userID)) || [];
+  const userChats = (await getSessions(socket.userID)).sessions || [];
 
   socket.emit("chats", userChats);
 
@@ -35,7 +35,7 @@ async function socketConnected(socket, io) {
     sessionID: socket.id,
     userID: socket.userID,
   });
-  socket.on("private message", async ({ content, to, from }) => {
+  socket.on("private message", async ({ content, to, time }) => {
     const senderID = socket.handshake.auth.userID;
 
     console.log(`${senderID} sent a private message "${content}" to ${to}`);
@@ -58,20 +58,28 @@ async function socketConnected(socket, io) {
       type: "responder",
       isRead: recieverIsOnline,
       id: uuid4(),
+      time: time,
     };
     const senderMessage = {
       message: content,
       type: "user",
       isRead: true,
       id: uuid4(),
+      time: time,
     };
 
     await saveMessage(senderSession, senderID, to, senderMessage);
 
     await saveMessage(receiverSession, to, senderID, recieverMessage);
 
-    io.to(to).to(senderID).emit("private message", {
-      content,
+    io.to(senderID).emit("private message", {
+      content: senderMessage,
+      from: senderID,
+      to,
+    });
+
+    io.to(to).emit("private message", {
+      content: recieverMessage,
       from: senderID,
       to,
     });

@@ -82,7 +82,7 @@ const useHandleMessages = () => {
 
     showEmojiPicker,
     handleInputOnEnter,
-
+    scrollMessages,
     handleInputOnClick,
     messagesContainer,
     newMessage,

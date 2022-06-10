@@ -8,11 +8,10 @@ import Chats from "../../components/Chats/Chats.component";
 import useUserCredentials from "../../hooks/useUserAccessData";
 
 import styles from "./chat_page.module.css";
-import { useAppDispatch } from "../../app/hooks";
 import { useSocket } from "../../hooks/socket";
 
 const ChatPage = () => {
-  const { user, isLogged, setUser, loading } = useUserCredentials();
+  const { user, isLogged, setUser } = useUserCredentials();
   const { handleDisconnect, messageListener, socketEventListener } =
     useSocket();
 
@@ -27,8 +26,10 @@ const ChatPage = () => {
     }
   }, [setUser]);
   useEffect(() => {
-    socketEventListener();
-  }, [socketEventListener]);
+    if (isLogged) {
+      socketEventListener();
+    }
+  }, []);
 
   useEffect(() => {
     if (!isLogged && !localStorage.getItem("user")) {
@@ -51,7 +52,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     handleDisconnect(user.id);
-  });
+  }, []);
 
   return (
     <div className={styles.messages_container}>
