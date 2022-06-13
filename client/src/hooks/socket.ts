@@ -2,7 +2,12 @@ import { useCallback, useEffect } from "react";
 import { io } from "socket.io-client";
 import { connection, contacts } from "../app/contacts/contacts.reducer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { setChats, setMessagesPerChat } from "../app/rooms/rooms.reducer";
+import {
+  setChats,
+  setMessagesPerChat,
+  addChat,
+} from "../app/rooms/rooms.reducer";
+import { getUserChats } from "../app/rooms/rooms.thunks";
 export const url = "http://localhost:3050/";
 export const socketApi = io(url, {
   autoConnect: false,
@@ -24,9 +29,10 @@ function useSocket() {
   }, []);
 
   const messagesListener = useCallback(() => {
-    socketApi.on("messages", (messages) => {
-      dispatch(setMessagesPerChat(messages));
-    });
+    // socketApi.on("messages", (messages) => {
+    //   console.log(messages);
+    //   dispatch(setMessagesPerChat(messages));
+    // });
   }, []);
 
   const sendMessageSocket = useCallback((content: string, contact: string) => {

@@ -14,6 +14,7 @@
     "node": "18.0.0"
   },
   "dependencies": {
+    "@socket.io/admin-ui": "^0.3.0",
     "bcrypt": "^5.0.1",
     "chat-app": "file:..",
     "cors": "^2.8.5",

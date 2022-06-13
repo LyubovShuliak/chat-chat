@@ -15,7 +15,7 @@ import {
   signUpUser,
   User,
 } from "../app/user/user.thunks";
-import { useSocket } from "./socket";
+import { socketApi, useSocket } from "./socket";
 
 function useUserCredentials() {
   const { connect } = useSocket();
@@ -116,6 +116,9 @@ function useUserCredentials() {
 
   function signOut() {
     dispatch(signOutUser());
+    socketApi.removeAllListeners();
+    socketApi.offAny();
+    socketApi.close();
   }
 
   return {

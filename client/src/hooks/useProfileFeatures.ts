@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useRef, useState } from "react";
-import { ref, uploadBytes } from "@firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+
 import { storage } from "../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { getAllUsers, getContacts } from "../app/contacts/contacts.thunks";
@@ -44,13 +45,56 @@ const useProfileFeatures = () => {
     };
   function previewFile(file: any, email: string) {
     const storageRef = ref(storage, `${email}/avatar.jpg`);
-    console.log(storageRef);
 
-    uploadBytes(storageRef, file)
-      .then((snapshot) => {
-        dispatch(addAvatar({ email, avatar: snapshot.metadata.fullPath }));
-      })
-      .catch(console.log);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    // Listen for state changes, errors, and completion of the upload.
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+        switch (snapshot.state) {
+          case "paused":
+            console.log("Upload is paused");
+            break;
+          case "running":
+            console.log("Upload is running");
+            break;
+        }
+      },
+      (error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        switch (error.code) {
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case "storage/unknown":
+            // Unknown error occurred, inspect error.serverResponse
+            break;
+          case "storage/object-not-found":
+            console.log("no image");
+
+            // Unknown error occurred, inspect error.serverResponse
+            break;
+        }
+      },
+      () => {
+        // Upload completed successfully, now we can get the download URL
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          dispatch(addAvatar({ email, avatar: downloadURL }));
+        });
+      }
+    );
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {

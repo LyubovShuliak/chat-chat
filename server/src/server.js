@@ -1,5 +1,7 @@
 const http = require("http");
 
+// const { instrument } = require("@socket.io/admin-ui");
+
 const { Server } = require("socket.io");
 const { v4: uuidv4 } = require("uuid");
 
@@ -17,8 +19,13 @@ const PORT = process.env.PORT || 3050;
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: "*",
+  cors: ["http://localhost:4000/", "https://admin.socket.io"],
+  credentials: false,
 });
+
+// instrument(io, {
+//   auth: false,
+// });
 
 io.on("connection", async (socket) => {
   await socketConnected(socket, io);

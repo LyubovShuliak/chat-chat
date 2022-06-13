@@ -13,16 +13,9 @@ const Messages = () => {
 
   const { messagesContainer, scrollMessages } = useHandleMessages();
 
-  const { messagesListener } = useSocket();
+  // const { messagesListener } = useSocket();
 
   const { id } = useParams();
-
-  useEffect(() => {
-    scrollMessages();
-    if (id) {
-      messagesListener();
-    }
-  }, []);
 
   useEffect(() => {
     scrollMessages();

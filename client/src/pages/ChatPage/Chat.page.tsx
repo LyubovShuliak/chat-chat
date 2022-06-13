@@ -9,15 +9,39 @@ import useUserCredentials from "../../hooks/useUserAccessData";
 
 import styles from "./chat_page.module.css";
 import { useSocket } from "../../hooks/socket";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { addChat, rooms } from "../../app/rooms/rooms.reducer";
+import { allUsers } from "../../app/contacts/contacts.reducer";
+import { getAllUsers } from "../../app/contacts/contacts.thunks";
 
 const ChatPage = () => {
   const { user, isLogged, setUser } = useUserCredentials();
-  const { handleDisconnect, messageListener, socketEventListener } =
-    useSocket();
+  const {
+    handleDisconnect,
+    messageListener,
+    socketEventListener,
+    userContacts,
+  } = useSocket();
 
   const navigation = useNavigate();
   // const dispatch = useAppDispatch();
   const { id } = useParams();
+  const chats = useAppSelector(rooms);
+  const all = useAppSelector(allUsers);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (isLogged && id) {
+      // dispatch(getAllUsers(user.email));
+      const newChat = chats.find((chat) => chat.id === id);
+      if (!newChat) {
+        const chat = all.find((chat) => chat.id === id);
+        console.log(chat);
+
+        dispatch(addChat(chat));
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     const user = localStorage.getItem("user");

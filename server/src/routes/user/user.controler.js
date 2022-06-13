@@ -51,9 +51,9 @@ async function httpLoggin(req, res) {
   }
 
   const response = await logIn(user);
-  if (response.message) {
+  if (response.error) {
     return res.status(400).send({
-      error: response.message,
+      error: response.error,
     });
   }
   const token = await signTokenAsync(user.email);

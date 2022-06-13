@@ -8,13 +8,22 @@ async function getSessions(id) {
 }
 
 async function updateUserSessions(id, chatData) {
-  await userDatabase.updateOne({ id: id }, { $push: { sessions: chatData } });
+  return await userDatabase.findOneAndUpdate(
+    { id: id },
+    { $push: { sessions: chatData } }
+  );
 }
 
 async function findSession(id) {
-  return await sessions
-    .findOne({ id: id }, "messages", { __v: 0, _id: 0 })
-    .lean();
+  try {
+    const session = await sessions.findOne({ id: id }, { __v: 0, _id: 0 });
+
+    if (session) {
+      return sessions;
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function saveMessage(session, id, responder, message) {
@@ -32,5 +41,6 @@ async function saveMessage(session, id, responder, message) {
     await sessions.insertMany([{ id: id, messages: receivedMessage }]);
   }
 }
+// async function saveMessage(session, id, responder, message) {}
 
 module.exports = { getSessions, updateUserSessions, findSession, saveMessage };

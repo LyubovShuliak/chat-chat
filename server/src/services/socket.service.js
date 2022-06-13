@@ -13,6 +13,7 @@ const {
 
 async function socketConnected(socket, io) {
   socket.join(socket.userID);
+
   let users = {};
 
   for (let [id, socket] of io.of("/").sockets) {
@@ -21,7 +22,9 @@ async function socketConnected(socket, io) {
   const messages = (await findSession(socket.userID)) || [];
   const userChats = (await getSessions(socket.userID)).sessions || [];
 
-  socket.emit("chats", userChats);
+  if (userChats.length) {
+    socket.emit("chats", userChats);
+  }
 
   socket.emit("messages", messages);
 
@@ -35,6 +38,7 @@ async function socketConnected(socket, io) {
     sessionID: socket.id,
     userID: socket.userID,
   });
+
   socket.on("private message", async ({ content, to, time }) => {
     const senderID = socket.handshake.auth.userID;
 
@@ -42,15 +46,25 @@ async function socketConnected(socket, io) {
 
     const recieverIsOnline = users[to] ? true : false;
 
-    const senderSession = await sessions.findOne({ id: senderID });
-    const receiverSession = await sessions.findOne({ id: to });
+    const senderSession = await sessions.findOne(
+      { id: senderID },
+      { __v: 0, _id: 0, sessions: 0 }
+    );
+    const receiverSession = await sessions.findOne(
+      { id: to },
+      { __v: 0, _id: 0, sessions: 0 }
+    );
 
     const receiver = await findUserByID(to);
     const sender = await findUserByID(senderID);
 
     if (!receiver.sessions.find((chat) => chat.id === sender.id)) {
-      await updateUserSessions(to, sender);
-      await updateUserSessions(senderID, receiver);
+      try {
+        const senderSession = await updateUserSessions(to, sender);
+        const receiverSession = await updateUserSessions(senderID, receiver);
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     const recieverMessage = {

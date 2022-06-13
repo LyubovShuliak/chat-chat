@@ -50,9 +50,10 @@ async function getAllUsers(limit, skip, email) {
   );
 }
 async function getContacts(email) {
-  const { contacts } = await userDatabase.findOne({ email: email }).lean();
-
-  return contacts;
+  const user = await userDatabase.findOne({ email: email }).lean();
+  if (user) {
+    return user.contacts;
+  }
 }
 
 async function addContact(contact, email) {
@@ -137,8 +138,12 @@ async function logIn(user) {
 
   const userPassword = await findUserByEmail(email);
 
+  if (!userPassword) {
+    return { error: "User not found" };
+  }
+
   if (!Object.keys(userPassword).length) {
-    return new Error("You must sign up");
+    return { error: "You must sign up" };
   }
 
   await bcrypt.compare(password, userPassword.password);

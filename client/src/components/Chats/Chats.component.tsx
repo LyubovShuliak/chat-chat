@@ -54,7 +54,7 @@ export default function Chats() {
       <ChatSearchBar />
 
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-        {userChats.length !== 0
+        {userChats && userChats.length !== 0
           ? userChats.map((chat) => {
               return (
                 <Link
