@@ -29,16 +29,16 @@ function useSocket() {
   }, []);
 
   const messagesListener = useCallback(() => {
-    // socketApi.on("messages", (messages) => {
-    //   console.log(messages);
-    //   dispatch(setMessagesPerChat(messages));
-    // });
+    socketApi.on("messages", (messages) => {
+      console.log(messages);
+      dispatch(setMessagesPerChat(messages));
+    });
   }, []);
 
   const sendMessageSocket = useCallback((content: string, contact: string) => {
     const user = localStorage.getItem("user");
     const now = new Date();
-    const time = now.getHours() + ":" + now.getMinutes();
+    const time = now;
 
     if (user) {
       socketApi.emit("private message", {

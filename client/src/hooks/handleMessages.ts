@@ -13,8 +13,6 @@ import { useSocket } from "./socket";
 const useHandleMessages = () => {
   const { sendMessageSocket } = useSocket();
 
-  const { id } = useParams();
-
   const [chosenEmoji, setChosenEmoji] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
 
@@ -46,29 +44,37 @@ const useHandleMessages = () => {
     setChosenEmoji(emojiObject);
   }, []);
 
-  const handleInputOnEnter = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.code === "Enter" && !e.shiftKey) {
-      e.preventDefault();
+  const handleInputOnEnter = useCallback(
+    (e: KeyboardEvent<HTMLDivElement>, id: string | undefined) => {
+      if (e.code === "Enter" && !e.shiftKey) {
+        e.preventDefault();
 
-      const value = e.currentTarget.innerText;
+        const value = e.currentTarget.innerText;
+        if (id) {
+          console.log(id);
+
+          sendMessageSocket(value, id);
+        }
+
+        e.currentTarget.innerText = "";
+        scrollMessages();
+      }
+    },
+    []
+  );
+  const handleInputOnClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>, id: string | undefined) => {
+      const value = newMessage.current!.innerText;
+
       if (id) {
         sendMessageSocket(value, id);
       }
 
-      e.currentTarget.innerText = "";
+      newMessage.current!.innerText = "";
       scrollMessages();
-    }
-  }, []);
-  const handleInputOnClick = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    const value = newMessage.current!.innerText;
-
-    if (id) {
-      sendMessageSocket(value, id);
-    }
-
-    newMessage.current!.innerText = "";
-    scrollMessages();
-  }, []);
+    },
+    []
+  );
 
   const showEmojiPicker = useCallback(() => {
     setShowPicker(!showPicker);

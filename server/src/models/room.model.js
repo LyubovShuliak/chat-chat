@@ -19,7 +19,13 @@ async function findSession(id) {
     const session = await sessions.findOne({ id: id }, { __v: 0, _id: 0 });
 
     if (session) {
-      return sessions;
+      if (session.messages) {
+        const newMessages = {};
+        for (let [key, value] of Object.entries(session.messages)) {
+          newMessages[key] = value.slice(-20);
+        }
+        return newMessages;
+      }
     }
   } catch (error) {
     console.log(error);
@@ -34,7 +40,7 @@ async function saveMessage(session, id, responder, message) {
     const messages = [...oldMessages, message];
     await sessions.updateOne(
       { id: id },
-      { $set: { messages: { [responder]: messages } } }
+      { messages: { ...session.messages, [responder]: messages } }
     );
   } else {
     const receivedMessage = { [responder]: [message] };

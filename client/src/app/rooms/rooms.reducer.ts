@@ -33,22 +33,21 @@ const roomsSlice = createSlice({
   initialState,
   reducers: {
     setChats: (state, action) => {
-      console.log(action.payload);
       state.sessions = action.payload;
     },
     addChat: (state, action) => {
-      console.log(action.payload);
-
       state.sessions.push(action.payload);
     },
 
     setMessagesPerChat: (state, action) => {
-      state.chats = action.payload;
+      console.log(action.payload);
+
+      state.chats.messages = action.payload;
     },
+    sendMessage: (state, action) => {},
   },
   extraReducers: (builder) => {
     builder.addCase(getUserChats.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.sessions = action.payload;
     });
   },
@@ -57,7 +56,7 @@ const roomsSlice = createSlice({
 export const { setChats, setMessagesPerChat, addChat } = roomsSlice.actions;
 
 export const rooms = (state: RootState) => state.rooms.sessions;
-export const chats = (state: RootState) => state.rooms.chats;
+export const chats = (state: RootState) => state.rooms.chats.messages;
 
 export const isLoading = (state: RootState) => state.rooms.isLoading;
 

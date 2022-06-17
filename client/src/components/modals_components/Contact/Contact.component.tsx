@@ -5,20 +5,22 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import ChatIcon from "@mui/icons-material/Chat";
 import DeleteContact from "@mui/icons-material/Delete";
-import { contacts, User } from "../../../app/contacts/contacts.reducer";
-import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { User } from "../../../app/contacts/contacts.reducer";
+import { useAppDispatch } from "../../../app/hooks";
 import Button from "@mui/material/Button";
-import { useSelector } from "react-redux";
 
 import { useNavigate } from "react-router-dom";
+import { addChat } from "../../../app/rooms/rooms.reducer";
 
 const Contact = (props: { user: User; handleClose: () => void }) => {
-  const { userName, email, id } = props.user;
+  const { userName, id } = props.user;
+  const { user } = props;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const createChat = () => {
     const currentUser = localStorage.getItem("user");
+    dispatch(addChat(user));
     if (currentUser) {
       props.handleClose();
       navigate(`/${id}`, { replace: true });

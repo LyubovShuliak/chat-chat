@@ -8,6 +8,7 @@ import messageInputStyles from "./sendMessage.module.css";
 
 import { useHandleMessages } from "../../hooks/handleMessages";
 import useUserAccessData from "../../hooks/useUserAccessData";
+import { useParams } from "react-router-dom";
 
 const SendMessage = () => {
   const {
@@ -19,6 +20,7 @@ const SendMessage = () => {
     newMessage,
     showPicker,
   } = useHandleMessages();
+  const { id } = useParams();
 
   return (
     <div className={messageInputStyles.container}>
@@ -56,7 +58,7 @@ const SendMessage = () => {
           className={messageInputStyles.messageInput}
           contentEditable
           placeholder="Write a message ..."
-          onKeyDown={handleInputOnEnter}
+          onKeyDown={(e) => handleInputOnEnter(e, id)}
         ></div>
         <button
           onClick={showEmojiPicker}
@@ -67,7 +69,7 @@ const SendMessage = () => {
 
         <button
           className={messageInputStyles.sendBtn}
-          onClick={(e) => handleInputOnClick(e)}
+          onClick={(e) => handleInputOnClick(e, id)}
         >
           <SendIcon
             style={{

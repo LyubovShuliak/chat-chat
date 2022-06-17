@@ -25,7 +25,6 @@ async function socketConnected(socket, io) {
   if (userChats.length) {
     socket.emit("chats", userChats);
   }
-
   socket.emit("messages", messages);
 
   socket.emit("users", users);
@@ -60,8 +59,8 @@ async function socketConnected(socket, io) {
 
     if (!receiver.sessions.find((chat) => chat.id === sender.id)) {
       try {
-        const senderSession = await updateUserSessions(to, sender);
-        const receiverSession = await updateUserSessions(senderID, receiver);
+        await updateUserSessions(to, sender);
+        await updateUserSessions(senderID, receiver);
       } catch (error) {
         console.log(error);
       }
@@ -81,10 +80,16 @@ async function socketConnected(socket, io) {
       id: uuid4(),
       time: time,
     };
-
-    await saveMessage(senderSession, senderID, to, senderMessage);
-
-    await saveMessage(receiverSession, to, senderID, recieverMessage);
+    try {
+      await saveMessage(senderSession, senderID, to, senderMessage);
+    } catch (error) {
+      console.log(error);
+    }
+    try {
+      await saveMessage(receiverSession, to, senderID, recieverMessage);
+    } catch (error) {
+      console.log(error);
+    }
 
     io.to(senderID).emit("private message", {
       content: senderMessage,

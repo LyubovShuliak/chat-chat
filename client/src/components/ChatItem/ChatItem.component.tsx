@@ -31,9 +31,9 @@ const ChatItem = (props: ChatData) => {
               </Typography>
             </React.Fragment>
           }
-          secondary={"Wish I could come, but I'm out of town this…"}
+          secondary={""}
         />
-        {/* <div className={styles.missed_messages_viget}>6</div> */}
+        <div className={styles.missed_messages_viget}>{0}</div>
       </ListItem>
     </>
   );

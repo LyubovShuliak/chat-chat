@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
-import { chats } from "../../app/rooms/rooms.reducer";
+import { chats, Message } from "../../app/rooms/rooms.reducer";
 import { useHandleMessages } from "../../hooks/handleMessages";
 import { socketApi, useSocket } from "../../hooks/socket";
 
@@ -11,9 +11,9 @@ import styles from "./messages.module.css";
 const Messages = () => {
   const messagesPerUser = useAppSelector(chats);
 
-  const { messagesContainer, scrollMessages } = useHandleMessages();
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  // const { messagesListener } = useSocket();
+  const { messagesContainer, scrollMessages } = useHandleMessages();
 
   const { id } = useParams();
 
@@ -21,10 +21,16 @@ const Messages = () => {
     scrollMessages();
   }, [messagesPerUser]);
 
+  useEffect(() => {
+    if (id) {
+      setMessages(messagesPerUser[id]);
+    }
+  }, [id]);
+
   return (
     <div className={styles.messages_container}>
-      {id && messagesPerUser.messages && messagesPerUser.messages[id]
-        ? messagesPerUser.messages[id].map((message) => {
+      {id && messages
+        ? messages.map((message) => {
             return <MessageListItem key={message.id} {...message} />;
           })
         : null}
