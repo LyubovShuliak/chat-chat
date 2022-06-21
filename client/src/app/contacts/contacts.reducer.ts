@@ -7,7 +7,6 @@ export type User = {
   email: string;
   id: string;
   userName: string;
-  connected: boolean;
 };
 
 type Contacts = { contacts: User[]; isLoading: boolean; allUsers: User[] };
@@ -16,14 +15,7 @@ const initialState: Contacts = { contacts: [], allUsers: [], isLoading: false };
 const contactsSlice = createSlice({
   name: "contacts",
   initialState,
-  reducers: {
-    connection: (state, action) => {
-      const user = state.contacts.find((u) => u.id === action.payload);
-      if (user) {
-        user.connected = true;
-      }
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getAllUsers.fulfilled, (state, action) => {
       state.allUsers = action.payload.filter((user: User) => {
@@ -49,7 +41,7 @@ const contactsSlice = createSlice({
   },
 });
 
-export const { connection } = contactsSlice.actions;
+export const {} = contactsSlice.actions;
 
 export const contacts = (state: RootState) => state.contacts.contacts;
 export const allUsers = (state: RootState) => state.contacts.allUsers;

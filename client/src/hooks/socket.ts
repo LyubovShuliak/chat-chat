@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { io } from "socket.io-client";
-import { connection, contacts } from "../app/contacts/contacts.reducer";
+import { contacts } from "../app/contacts/contacts.reducer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   setChats,
@@ -58,7 +58,6 @@ function useSocket() {
 
   const connectStatusListener = useCallback(() => {
     socketApi.on("user connected", ({ sessionID, userID }) => {
-      dispatch(connection(userID));
       console.log(userContacts);
     });
   }, []);
@@ -75,11 +74,7 @@ function useSocket() {
     socketApi.on("users", (users) => {
       console.log(users);
 
-      userContacts.forEach((user) => {
-        if (users[user.id]) {
-          dispatch(connection(user.id));
-        }
-      });
+      userContacts.forEach((user) => {});
       console.log(userContacts);
     });
   }, []);
