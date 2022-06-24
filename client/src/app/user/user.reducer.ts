@@ -11,6 +11,7 @@ interface Log {
   user: {
     email: string;
     userName: string;
+    id: string;
   };
 }
 
@@ -23,6 +24,7 @@ const initialState: Log = {
   user: {
     email: "",
     userName: "",
+    id: "",
   },
 };
 
@@ -65,6 +67,7 @@ const usersSlice = createSlice({
         localStorage.setItem("user", JSON.stringify(action.payload.user));
         state.errorMesssage = "";
         state.token = action.payload.token;
+        state.user = action.payload.user;
         state.logStatus = true;
         state.isLoading = false;
       }

@@ -1,14 +1,8 @@
-import { connect } from "http2";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { store } from "../app/store";
-import {
-  error,
-  isLoading,
-  logStatus,
-  signOutUser,
-} from "../app/user/user.reducer";
+import { isLoading, logStatus, signOutUser } from "../app/user/user.reducer";
 import {
   checkAccesToken,
   logIn,
@@ -32,18 +26,19 @@ function useUserCredentials() {
   const dispatch = useAppDispatch();
   let navigate = useNavigate();
 
-  const errorMesssage = useAppSelector(error);
   const isLogged = useAppSelector(logStatus);
   const loading = useAppSelector(isLoading);
 
-  useEffect(() => {
-    if (user.id) {
-      connect(user.id);
+  function navigation(currentUser: {
+    email: string;
+    userName: string;
+    id: string;
+  }) {
+    if (currentUser) {
+      connect(currentUser.id);
     }
-  }, [user]);
 
-  function navigation() {
-    navigate("/", { replace: true });
+    navigate("/", { replace: true, state: currentUser });
   }
 
   const validateToken = useCallback(async () => {
@@ -54,7 +49,7 @@ function useUserCredentials() {
     await dispatch(checkAccesToken(token));
 
     if (store.getState().user.logStatus) {
-      return navigate("/", { replace: true });
+      return navigation(store.getState().user.user);
     } else {
       return navigate("/login", { replace: true });
     }
@@ -80,7 +75,7 @@ function useUserCredentials() {
         const errorMesssage = store.getState().user.errorMesssage;
 
         if (!errorMesssage) {
-          navigation();
+          navigation(store.getState().user.user);
         } else {
           return errorMesssage;
         }
@@ -106,7 +101,7 @@ function useUserCredentials() {
         const errorMesssage = store.getState().user.errorMesssage;
 
         if (!errorMesssage) {
-          navigation();
+          navigation(store.getState().user.user);
         } else {
           return errorMesssage;
         }
@@ -118,7 +113,7 @@ function useUserCredentials() {
     dispatch(signOutUser());
     socketApi.removeAllListeners();
     socketApi.offAny();
-    socketApi.close();
+    socketApi.disconnect();
   }
 
   return {

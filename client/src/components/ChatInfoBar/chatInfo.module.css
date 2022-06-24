@@ -1,0 +1,16 @@
+.info_bar {
+  width: 100%;
+  position: sticky;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  background-color: azure;
+}
+.online {
+  color: blue;
+}
+.offline {
+  color: red;
+}

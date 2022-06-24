@@ -1,21 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, lazy } from "react";
 
-import List from "@mui/material/List";
-
-import ChatSearchBar from "../SearchBar/ChatSearchBar.component";
-
-import styles from "./chats.module.css";
 import { useAppDispatch } from "../../app/hooks";
 
-import { ChatItem } from "../ChatItem/ChatItem.component";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { socketApi, useSocket } from "../../hooks/socket";
-import { ChatData, setChats } from "../../app/rooms/rooms.reducer";
+import {
+  chatConnection,
+  ChatData,
+  setChats,
+} from "../../app/rooms/rooms.reducer";
 import { getContacts } from "../../app/contacts/contacts.thunks";
+import styles from "./chats.module.css";
+
+const ChatItem = lazy(() => import("../ChatItem/ChatItem.component"));
+const ChatSearchBar = lazy(
+  () => import("../SearchBar/ChatSearchBar.component")
+);
+const List = lazy(() => import("@mui/material/List"));
 
 export default function Chats(props: { chats: ChatData[] }) {
   const { chats } = props;
   const dispatch = useAppDispatch();
+
+  const { id } = useParams();
 
   const { getContactsStatus } = useSocket();
 
@@ -25,13 +32,14 @@ export default function Chats(props: { chats: ChatData[] }) {
     if (user) {
       getContactsStatus();
     }
-  }, []);
+  }, [getContactsStatus]);
 
   useEffect(() => {
     socketApi.on("chats", (chats) => {
       dispatch(setChats(chats));
+      dispatch(chatConnection(id));
     });
-  }, []);
+  }, [dispatch, id]);
 
   useEffect(() => {
     const currentUser = localStorage.getItem("user");
@@ -42,7 +50,7 @@ export default function Chats(props: { chats: ChatData[] }) {
         dispatch(getContacts(email));
       }
     }
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className={styles.chat_block}>
@@ -57,7 +65,7 @@ export default function Chats(props: { chats: ChatData[] }) {
                 pathname: `/${chat.id}`,
               }}
             >
-              <ChatItem {...chat} />
+              <ChatItem chatdata={chat} />
             </Link>
           );
         })}

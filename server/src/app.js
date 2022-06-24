@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const helmet = require("helmet");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const userRouter = require("./routes/user/user.router");
 const contactsRouter = require("./routes/contacts/contacts.router");
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(helmet());
 
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use("/api", userRouter);

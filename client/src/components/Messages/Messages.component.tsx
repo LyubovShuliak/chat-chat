@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy } from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import { chats, Message } from "../../app/rooms/rooms.reducer";

@@ -1,42 +1,103 @@
-import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-
-import Messages from "../../components/Messages/Messages.component";
-import SendMessage from "../../components/SendMessage/SendMessage.component";
-import Chats from "../../components/Chats/Chats.component";
+import { lazy, useEffect, useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 import useUserCredentials from "../../hooks/useUserAccessData";
 
+import { socketApi, useSocket } from "../../hooks/socket";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  chatConnection,
+  ChatData,
+  rooms,
+  setChats,
+  setCurrentChat,
+} from "../../app/rooms/rooms.reducer";
+
 import styles from "./chat_page.module.css";
-import { useSocket } from "../../hooks/socket";
-import { useAppSelector } from "../../app/hooks";
-import { rooms } from "../../app/rooms/rooms.reducer";
+import { getContacts } from "../../app/contacts/contacts.thunks";
+
+const Messages = lazy(
+  () => import("../../components/Messages/Messages.component")
+);
+const SendMessage = lazy(
+  () => import("../../components/SendMessage/SendMessage.component")
+);
+const Chats = lazy(() => import("../../components/Chats/Chats.component"));
+const ChatInfo = lazy(
+  () => import("../../components/ChatInfoBar/ChatInfo.component")
+);
 
 const ChatPage = () => {
   const { user, isLogged, setUser } = useUserCredentials();
   const {
     handleDisconnect,
     messageListener,
-    socketEventListener,
+    connectStatusListener,
     messagesListener,
+    onDisconnect,
   } = useSocket();
 
+  const location = useLocation();
+
   const navigation = useNavigate();
-  // const dispatch = useAppDispatch();
-  const { id } = useParams();
   const chats = useAppSelector(rooms);
+
+  const dispatch = useAppDispatch();
+
+  const { id } = useParams();
+
+  const { getContactsStatus } = useSocket();
 
   useEffect(() => {
     const user = localStorage.getItem("user");
+
     if (user) {
-      setUser(JSON.parse(user));
+      getContactsStatus();
     }
-  }, [setUser]);
+  }, [getContactsStatus]);
+
   useEffect(() => {
-    if (isLogged) {
-      socketEventListener();
-    }
+    onDisconnect();
+  }, [id]);
+
+  useEffect(() => {
+    socketApi.on("chats", (chats) => {
+      dispatch(setChats(chats));
+      dispatch(chatConnection(id));
+    });
   }, []);
+
+  useEffect(() => {
+    const currentUser = localStorage.getItem("user");
+    if (currentUser) {
+      const email = JSON.parse(currentUser)!.email;
+
+      if (email) {
+        dispatch(getContacts(email));
+      }
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    connectStatusListener();
+  }, []);
+
+  useEffect(() => {
+    if (id && chats.length) {
+      dispatch(setCurrentChat(chats.find((chat) => chat.id === id)));
+    }
+  }, [id, chats]);
+
+  useEffect(() => {
+    setUser(
+      location.state as {
+        email: string;
+        userName: string;
+        id: string;
+      }
+    );
+  }, []);
+
   useEffect(() => {
     messagesListener();
   }, []);
@@ -54,14 +115,21 @@ const ChatPage = () => {
     ) {
       console.log("reload");
     }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     messageListener();
   }, []);
 
   useEffect(() => {
-    handleDisconnect(user.id);
+    const currentUser = location.state as {
+      email: string;
+      userName: string;
+      id: string;
+    };
+    if (currentUser) {
+      handleDisconnect(currentUser.id);
+    }
   }, []);
 
   return (
@@ -69,7 +137,11 @@ const ChatPage = () => {
       <Chats chats={chats} />
       {id ? (
         <div className={styles.messages_block}>
-          <Messages />
+          <div className={styles.chat_content}>
+            <ChatInfo />
+            <Messages />
+          </div>
+
           <SendMessage />
         </div>
       ) : null}

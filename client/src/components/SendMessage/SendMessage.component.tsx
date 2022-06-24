@@ -1,14 +1,15 @@
-import Picker from "emoji-picker-react";
-
-import PickEmoji from "@mui/icons-material/SentimentSatisfiedAlt";
-import SendIcon from "@mui/icons-material/Send";
-import AttachFile from "@mui/icons-material/AttachFile";
+import { lazy } from "react";
+import { useHandleMessages } from "../../hooks/handleMessages";
+import { useParams } from "react-router-dom";
 
 import messageInputStyles from "./sendMessage.module.css";
 
-import { useHandleMessages } from "../../hooks/handleMessages";
-import useUserAccessData from "../../hooks/useUserAccessData";
-import { useParams } from "react-router-dom";
+const Picker = lazy(() => import("emoji-picker-react"));
+const PickEmoji = lazy(
+  () => import("@mui/icons-material/SentimentSatisfiedAlt")
+);
+const SendIcon = lazy(() => import("@mui/icons-material/Send"));
+const AttachFile = lazy(() => import("@mui/icons-material/AttachFile"));
 
 const SendMessage = () => {
   const {

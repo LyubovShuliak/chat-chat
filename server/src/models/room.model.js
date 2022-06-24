@@ -22,7 +22,7 @@ async function findSession(id) {
       if (session.messages) {
         const newMessages = {};
         for (let [key, value] of Object.entries(session.messages)) {
-          newMessages[key] = value.slice(-20);
+          newMessages[key] = value.slice(-30);
         }
         return newMessages;
       }

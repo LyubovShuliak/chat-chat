@@ -6,8 +6,8 @@ import {
   useCallback,
   MouseEvent,
 } from "react";
-import { useParams } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppDispatch } from "../app/hooks";
+import { ChatData } from "../app/rooms/rooms.reducer";
 import { useSocket } from "./socket";
 
 const useHandleMessages = () => {
@@ -23,7 +23,7 @@ const useHandleMessages = () => {
 
   // const sentMessages = useAppSelector(messages);
 
-  const scrollMessages = useCallback(() => {
+  const scrollMessages = () => {
     const messagesScroll = messagesContainer.current;
 
     if (messagesScroll) {
@@ -32,7 +32,7 @@ const useHandleMessages = () => {
         block: "nearest",
       });
     }
-  }, []);
+  };
 
   const onEmojiClick = useCallback((event: any, emojiObject: any) => {
     const messageInput = newMessage.current;
@@ -78,7 +78,7 @@ const useHandleMessages = () => {
 
   const showEmojiPicker = useCallback(() => {
     setShowPicker(!showPicker);
-  }, []);
+  }, [showPicker]);
 
   // const deleteMessage = useCallback((id: string) => {
   //   dispatch(deletingMessage(id));

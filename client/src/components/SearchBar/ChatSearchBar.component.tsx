@@ -1,15 +1,17 @@
-import * as React from "react";
+import { lazy } from "react";
 import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import InputBase from "@mui/material/InputBase";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
 import useProfileFeatures from "../../hooks/useProfileFeatures";
-import Profile from "../Profile/Profile.component";
-import Drawer from "@mui/material/Drawer";
+
+const SearchIcon = lazy(() => import("@mui/icons-material/Search"));
+const MenuIcon = lazy(() => import("@mui/icons-material/Menu"));
+const Drawer = lazy(() => import("@mui/material/Drawer"));
+const InputBase = lazy(() => import("@mui/material/InputBase"));
+const IconButton = lazy(() => import("@mui/material/IconButton"));
+const Toolbar = lazy(() => import("@mui/material/Toolbar"));
+const AppBar = lazy(() => import("@mui/material/AppBar"));
+const Box = lazy(() => import("@mui/material/Box"));
+
+const Profile = lazy(() => import("../Profile/Profile.component"));
 
 export const Search = styled("div")(({ theme }) => ({
   position: "relative",

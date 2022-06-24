@@ -41,8 +41,6 @@ const contactsSlice = createSlice({
   },
 });
 
-export const {} = contactsSlice.actions;
-
 export const contacts = (state: RootState) => state.contacts.contacts;
 export const allUsers = (state: RootState) => state.contacts.allUsers;
 

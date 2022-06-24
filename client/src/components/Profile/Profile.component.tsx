@@ -4,29 +4,30 @@ import React, {
   useMemo,
   useRef,
   useState,
+  lazy,
 } from "react";
 import { Link } from "react-router-dom";
-
-import Input from "@mui/material/Input";
-import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
-import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { InputLabel } from "@mui/material";
-
-import ContactsModal from "../modals_components/Contacts/Contacts.modal.component";
 
 import useProfileFeatures from "../../hooks/useProfileFeatures";
 import useUserCredentials from "../../hooks/useUserAccessData";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 import profile from "./profile.module.css";
-import path from "path";
+
+const ContactsModal = lazy(
+  () => import("../modals_components/Contacts/Contacts.modal.component")
+);
+const InputLabel = lazy(() => import("@mui/material/InputLabel"));
+const LogoutIcon = lazy(() => import("@mui/icons-material/Logout"));
+const Typography = lazy(() => import("@mui/material/Typography" as any));
+const Input = lazy(() => import("@mui/material/Input"));
+const AddAPhotoIcon = lazy(() => import("@mui/icons-material/AddAPhoto"));
+const Avatar = lazy(() => import("@mui/material/Avatar"));
+const ListItemAvatar = lazy(() => import("@mui/material/ListItemAvatar"));
+const ListItemText = lazy(() => import("@mui/material/ListItemText"));
+const ListItem = lazy(() => import("@mui/material/ListItem"));
+const List = lazy(() => import("@mui/material/List"));
+const Box = lazy(() => import("@mui/material/Box"));
 
 export default function Profile() {
   const [changeAvatar, setAvatar] = useState(false);

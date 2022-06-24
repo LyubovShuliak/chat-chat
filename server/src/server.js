@@ -1,9 +1,10 @@
 const http = require("http");
 
+const shell = require("shelljs");
+
 // const { instrument } = require("@socket.io/admin-ui");
 
 const { Server } = require("socket.io");
-const { v4: uuidv4 } = require("uuid");
 
 const open = require("open");
 
@@ -46,7 +47,7 @@ function startServer() {
     console.log(`Listening to the port ${PORT}`);
     // open(`http://localhost:${PORT}/`);
   });
-  console.clear();
+  shell.exec("clear");
 }
 
 startServer();
