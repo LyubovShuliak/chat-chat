@@ -29,7 +29,7 @@ const initialState: Contacts = {
 };
 
 const roomsSlice = createSlice({
-  name: "contacts",
+  name: "rooms",
   initialState,
   reducers: {
     setChats: (state, action) => {
