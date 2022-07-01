@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { getUserChats } from "./rooms.thunks";
+import { logout } from "../actions";
 
 export type Message = {
   message: string;
@@ -19,8 +20,15 @@ export type ChatData = {
   userName: string;
   connected: boolean;
 };
-
-export type Chats = { messages: { [key: string]: Message[] } };
+export type Pagination = { [key: string]: number };
+export type UnReadMessages = { [key: string]: number };
+export type Chats = {
+  messages: {
+    [key: string]: { [key: number]: Message[] };
+  };
+  pagination: Pagination;
+  unReadMessages: UnReadMessages;
+};
 
 type Contacts = {
   chats: Chats;
@@ -29,14 +37,14 @@ type Contacts = {
   currentChat: ChatData | null;
 };
 const initialState: Contacts = {
-  chats: { messages: {} },
+  chats: { messages: {}, pagination: {}, unReadMessages: {} },
   isLoading: false,
   sessions: [],
   currentChat: null,
 };
 
 const roomsSlice = createSlice({
-  name: "contacts",
+  name: "rooms",
   initialState,
   reducers: {
     setChats: (state, action) => {
@@ -50,10 +58,36 @@ const roomsSlice = createSlice({
     },
 
     setMessagesPerChat: (state, action) => {
-      state.chats.messages = action.payload;
+      for (const key in action.payload) {
+        state.chats.messages[key] = Object.assign(
+          action.payload[key],
+          state.chats.messages[key] ? state.chats.messages[key] : {}
+        );
+
+        for (const indexKey in action.payload[key]) {
+          state.chats.pagination[key] = Number(indexKey);
+        }
+      }
+    },
+    setMessagesRead: (state, action) => {
+      const readMessages = state.chats.messages[action.payload][1].map(
+        (el) => ({
+          ...el,
+          isRead: true,
+        })
+      );
+      state.chats.messages[action.payload][1] = readMessages;
     },
 
-    sendMessage: (state, action) => {},
+    sendMessage: (state, action) => {
+      if (!state.chats.messages[action.payload.to]) {
+        state.chats.messages[action.payload.to] = { 1: [] };
+      }
+      state.chats.messages[action.payload.to][1] = [
+        action.payload,
+        ...state.chats.messages[action.payload.to][1],
+      ];
+    },
     chatConnection: (state, action) => {
       state.sessions = state.sessions.map((u) =>
         u.id === action.payload ? { ...u, connected: true } : u
@@ -81,20 +115,26 @@ const roomsSlice = createSlice({
         connected: false,
       }));
     });
+    builder.addCase(logout, () => initialState);
   },
 });
 
 export const {
+  sendMessage,
   setChats,
   setMessagesPerChat,
   addChat,
   setCurrentChat,
   chatConnection,
   chatDisconnection,
+  setMessagesRead,
 } = roomsSlice.actions;
 
 export const rooms = (state: RootState) => state.rooms.sessions;
 export const chats = (state: RootState) => state.rooms.chats.messages;
+
+export const pagination = (state: RootState) => state.rooms.chats.pagination;
+
 export const currentChat = (state: RootState) => state.rooms.currentChat;
 
 export const isLoading = (state: RootState) => state.rooms.isLoading;

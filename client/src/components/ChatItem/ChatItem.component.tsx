@@ -1,5 +1,11 @@
-import React, { lazy } from "react";
-import { ChatData } from "../../app/rooms/rooms.reducer";
+import React, { lazy, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  ChatData,
+  chats,
+  setMessagesRead,
+} from "../../app/rooms/rooms.reducer";
 import styles from "./chatItem.module.css";
 
 const ListItem = lazy(() => import("@mui/material/ListItem"));
@@ -10,7 +16,29 @@ const Avatar = lazy(() => import("@mui/material/Avatar"));
 const Typography = lazy(() => import("@mui/material/Typography" as any));
 
 const ChatItem = (props: { chatdata: ChatData }) => {
+  const param = useParams();
   const { userName, email, id } = props.chatdata;
+  const messagesPerUser = useAppSelector(chats);
+  const dispatch = useAppDispatch();
+
+  const [viget, setViget] = useState<number>(0);
+  useEffect(() => {
+    messagesPerUser[id]
+      ? setViget(messagesPerUser[id][1].filter((el) => !el.isRead).length)
+      : setViget(viget);
+  }, []);
+  useEffect(() => {
+    if (param.id === id) {
+      setViget(0);
+      if (messagesPerUser[id]) {
+        dispatch(setMessagesRead(param.id));
+      }
+    } else {
+      if (messagesPerUser[id])
+        setViget(messagesPerUser[id][1].filter((el) => !el.isRead).length);
+    }
+  }, []);
+
   return (
     <>
       <Divider variant="inset" component="li" />
@@ -34,7 +62,8 @@ const ChatItem = (props: { chatdata: ChatData }) => {
             }
             secondary={""}
           />
-          <div className={styles.missed_messages_viget}>{0}</div>
+
+          {viget && <div className={styles.missed_messages_viget}>{viget}</div>}
         </ListItem>
       </ul>
     </>

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { getAllUsers, addContact, getContacts } from "./contacts.thunks";
+import { logout } from "../actions";
 
 export type User = {
   avatar: string;
@@ -38,6 +39,7 @@ const contactsSlice = createSlice({
         connected: false,
       }));
     });
+    builder.addCase(logout, () => initialState);
   },
 });
 

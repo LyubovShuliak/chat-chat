@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 import useUserCredentials from "../../hooks/useUserAccessData";
@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   chatConnection,
   ChatData,
+  pagination,
   rooms,
   setChats,
   setCurrentChat,
@@ -35,7 +36,10 @@ const ChatPage = () => {
     connectStatusListener,
     messagesListener,
     onDisconnect,
+    connect,
   } = useSocket();
+
+  const messagesPagination = useAppSelector(pagination);
 
   const location = useLocation();
 
@@ -63,7 +67,6 @@ const ChatPage = () => {
   useEffect(() => {
     socketApi.on("chats", (chats) => {
       dispatch(setChats(chats));
-      dispatch(chatConnection(id));
     });
   }, []);
 
@@ -84,7 +87,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (id && chats.length) {
-      dispatch(setCurrentChat(chats.find((chat) => chat.id === id)));
+      dispatch(setCurrentChat(chats.find((chat: ChatData) => chat.id === id)));
     }
   }, [id, chats]);
 
@@ -101,24 +104,27 @@ const ChatPage = () => {
   useEffect(() => {
     messagesListener();
   }, []);
+  useEffect(() => {
+    if (id && !messagesPagination[id]) {
+      socketApi.emit("get more messages", 1, id);
+    }
+  }, [id]);
 
   useEffect(() => {
     if (!isLogged && !localStorage.getItem("user")) {
       navigation("/signup", { replace: true });
     }
-
-    if (
-      window.performance
-        .getEntriesByType("navigation")
-        .map((nav: any) => nav.type)
-        .includes("reload")
-    ) {
-      console.log("reload");
-    }
-  }, []);
+    const user = localStorage.getItem("user");
+    if (!user) return;
+    if (!JSON.parse(user)) return;
+    connect(JSON.parse(user)!.id);
+  }, [user]);
 
   useEffect(() => {
-    messageListener();
+    const user = localStorage.getItem("user");
+    if (!user) return;
+    if (!JSON.parse(user).id) return;
+    messageListener(JSON.parse(user).id, id);
   }, []);
 
   useEffect(() => {
@@ -134,7 +140,9 @@ const ChatPage = () => {
 
   return (
     <div className={styles.messages_container}>
-      <Chats chats={chats} />
+      <Suspense>
+        <Chats chats={chats} />
+      </Suspense>
       {id ? (
         <div className={styles.messages_block}>
           <div className={styles.chat_content}>

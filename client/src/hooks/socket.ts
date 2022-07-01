@@ -1,12 +1,15 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { io } from "socket.io-client";
 import { contacts } from "../app/contacts/contacts.reducer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   chatConnection,
   chatDisconnection,
+  pagination,
+  sendMessage,
   setMessagesPerChat,
 } from "../app/rooms/rooms.reducer";
+
 export const url = "http://localhost:3050/";
 export const socketApi = io(url, {
   autoConnect: false,
@@ -14,6 +17,7 @@ export const socketApi = io(url, {
 
 function useSocket() {
   const dispatch = useAppDispatch();
+
   const userContacts = useAppSelector(contacts);
 
   const connect = useCallback((userID: string) => {
@@ -23,7 +27,6 @@ function useSocket() {
 
   const messagesListener = useCallback(() => {
     socketApi.on("messages", (messages) => {
-      console.log(messages);
       dispatch(setMessagesPerChat(messages));
     });
   }, []);
@@ -43,11 +46,18 @@ function useSocket() {
     }
   }, []);
 
-  const messageListener = useCallback(() => {
-    socketApi.on("private message", ({ content, from }) => {
-      console.log(content, from);
-    });
-  }, []);
+  const messageListener = useCallback(
+    (id: string, sender: string | undefined) => {
+      socketApi.on("private message", ({ content, from, to }) => {
+        if (from === id) {
+          dispatch(sendMessage({ ...content, to: to }));
+        } else {
+          dispatch(sendMessage({ ...content, to: from }));
+        }
+      });
+    },
+    []
+  );
 
   const connectStatusListener = useCallback(() => {
     socketApi.on("user connected", ({ sessionID, userID }) => {
@@ -70,9 +80,8 @@ function useSocket() {
 
   const getContactsStatus = useCallback(() => {
     socketApi.on("users", (users) => {
-      userContacts.forEach((user) => {
-        if (users[user.id]) {
-        }
+      Object.keys(users).forEach((user: any) => {
+        dispatch(chatConnection(user));
       });
     });
   }, []);

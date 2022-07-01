@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { logout } from "../actions";
 import { RootState } from "../store";
 import { checkAccesToken, logIn, signUpUser, addAvatar } from "./user.thunks";
 
@@ -32,14 +33,6 @@ const usersSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    signOutUser: (state) => {
-      state.logStatus = false;
-      state.errorMesssage = "";
-      state.token = "";
-      state.isLoading = false;
-      delete localStorage.access;
-      delete localStorage.user;
-    },
     checkIsLoged: (state) => {
       const token = localStorage.getItem("access");
       const user = localStorage.getItem("user");
@@ -121,10 +114,15 @@ const usersSlice = createSlice({
     builder.addCase(logIn.rejected, (state, action) => {
       state.errorMesssage = action.error as string;
     });
+    builder.addCase(logout, (state) => {
+      state = initialState;
+      delete localStorage.access;
+      delete localStorage.user;
+    });
   },
 });
 
-export const { signOutUser, checkIsLoged } = usersSlice.actions;
+export const { checkIsLoged } = usersSlice.actions;
 
 export const isLoading = (state: RootState) => state.user.isLoading;
 export const error = (state: RootState) => state.user.errorMesssage;

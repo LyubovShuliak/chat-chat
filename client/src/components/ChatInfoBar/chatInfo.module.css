@@ -1,16 +1,25 @@
 .info_bar {
   width: 100%;
+  padding: 20px 40px;
+  min-height: 80px;
+  box-sizing: border-box;
   position: sticky;
-
+  display: flex;
   top: 0;
   left: 0;
   right: 0;
+  flex-direction: column;
+  gap: 10px;
 
   background-color: azure;
 }
 .online {
-  color: blue;
+  color: rgb(7, 160, 248);
 }
 .offline {
   color: red;
+}
+.name {
+  font-size: 20px;
+  font-weight: 400;
 }

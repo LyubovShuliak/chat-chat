@@ -12,13 +12,13 @@ const ChatInfo = () => {
   }, [chat]);
   return (
     <div className={styles.info_bar}>
-      <p>{chat?.userName}</p>
+      <p className={styles.name}>{chat?.userName}</p>
       <p
         className={`${styles.info_connected} ${
-          chat?.connected ? "online" : "offline"
+          chat?.connected ? styles.online : styles.offline
         }`}
       >
-        {store.getState().rooms.currentChat?.connected ? "online" : "offline"}
+        {chat?.connected ? "online" : "offline"}
       </p>
     </div>
   );

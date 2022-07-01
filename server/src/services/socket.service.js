@@ -7,25 +7,45 @@ const { findUserByID } = require("../models/user.model.js");
 const {
   getSessions,
   updateUserSessions,
+  findSessionChat,
   findSession,
   saveMessage,
+  updateMessageStatus,
 } = require("../models/room.model.js");
 
-async function socketConnected(socket, io) {
+async function socketConnected(socket, io, pubClient) {
   socket.join(socket.userID);
 
   let users = {};
 
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("user disconnected", { id: socket.userID });
+  });
+
   for (let [id, socket] of io.of("/").sockets) {
     users[socket.userID] = id;
   }
-  const messages = (await findSession(socket.userID)) || [];
+
   const userChats = (await getSessions(socket.userID)).sessions || [];
 
   if (userChats.length) {
     socket.emit("chats", userChats);
   }
-  socket.emit("messages", messages);
+
+  socket.on("get more messages", async (page, id) => {
+    const moreMessagesPerChat = await findSessionChat(
+      socket.userID,
+      {
+        limit: 20,
+        page: page,
+      },
+      id
+    );
+
+    if (Object.keys(moreMessagesPerChat)) {
+      socket.emit("messages", moreMessagesPerChat);
+    }
+  });
 
   socket.emit("users", users);
 
@@ -38,12 +58,12 @@ async function socketConnected(socket, io) {
     userID: socket.userID,
   });
 
+  socket.on("message is read", async (id, unReadMessages, sender) => {
+    await updateMessageStatus(id, unReadMessages, sender);
+  });
+
   socket.on("private message", async ({ content, to, time }) => {
     const senderID = socket.handshake.auth.userID;
-
-    console.log(`${senderID} sent a private message "${content}" to ${to}`);
-
-    const recieverIsOnline = users[to] ? true : false;
 
     const senderSession = await sessions.findOne(
       { id: senderID },
@@ -69,7 +89,7 @@ async function socketConnected(socket, io) {
     const recieverMessage = {
       message: content,
       type: "responder",
-      isRead: recieverIsOnline,
+      isRead: false,
       id: uuid4(),
       time: time,
     };
@@ -80,6 +100,7 @@ async function socketConnected(socket, io) {
       id: uuid4(),
       time: time,
     };
+
     try {
       await saveMessage(senderSession, senderID, to, senderMessage);
     } catch (error) {
@@ -91,7 +112,7 @@ async function socketConnected(socket, io) {
       console.log(error);
     }
 
-    io.to(senderID).emit("private message", {
+    io.to(socket.userID).emit("private message", {
       content: senderMessage,
       from: senderID,
       to,

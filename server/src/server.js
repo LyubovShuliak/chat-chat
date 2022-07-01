@@ -1,6 +1,9 @@
 const http = require("http");
-
 const shell = require("shelljs");
+
+const { createClient } = require("redis");
+
+const { createAdapter } = require("@socket.io/redis-adapter");
 
 // const { instrument } = require("@socket.io/admin-ui");
 
@@ -10,7 +13,6 @@ const open = require("open");
 
 const { mongoConnect } = require("./services/mongo");
 const { socketConnected } = require("./services/socket.service");
-const userDatabase = require("./models/user.mongo");
 
 require("dotenv").config();
 
@@ -23,20 +25,30 @@ const io = new Server(server, {
   cors: ["http://localhost:4000/", "https://admin.socket.io"],
   credentials: false,
 });
+const pubClient = createClient({ host: "localhost", port: 6379 });
+const subClient = pubClient.duplicate();
+
+Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+  io.adapter(createAdapter(pubClient, subClient));
+});
 
 // instrument(io, {
 //   auth: false,
 // });
-
 io.on("connection", async (socket) => {
-  await socketConnected(socket, io);
+  await socketConnected(socket, io, pubClient);
 });
-io.use((socket, next) => {
+
+io.use(async (socket, next) => {
   const userID = socket.handshake.auth.userID;
+
+  await pubClient.hSet("sessions", `session:${userID}`, userID);
+
+  // pubClient.hKeys("sessions").then(console.log);
+
   if (!userID) {
     return next(new Error("invalid username"));
   }
-  console.log(`${userID} connected`);
   socket.userID = userID;
   next();
 });
@@ -45,7 +57,6 @@ function startServer() {
   mongoConnect();
   server.listen(PORT, () => {
     console.log(`Listening to the port ${PORT}`);
-    // open(`http://localhost:${PORT}/`);
   });
   shell.exec("clear");
 }

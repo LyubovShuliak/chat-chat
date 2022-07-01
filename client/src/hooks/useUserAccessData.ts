@@ -1,8 +1,9 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../app/actions";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { store } from "../app/store";
-import { isLoading, logStatus, signOutUser } from "../app/user/user.reducer";
+import { isLoading, logStatus } from "../app/user/user.reducer";
 import {
   checkAccesToken,
   logIn,
@@ -110,7 +111,8 @@ function useUserCredentials() {
   }
 
   function signOut() {
-    dispatch(signOutUser());
+    // dispatch(signOutUser());
+    dispatch(logout());
     socketApi.removeAllListeners();
     socketApi.offAny();
     socketApi.disconnect();

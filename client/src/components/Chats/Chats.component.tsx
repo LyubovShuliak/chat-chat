@@ -22,8 +22,6 @@ export default function Chats(props: { chats: ChatData[] }) {
   const { chats } = props;
   const dispatch = useAppDispatch();
 
-  const { id } = useParams();
-
   const { getContactsStatus } = useSocket();
 
   useEffect(() => {
@@ -33,13 +31,6 @@ export default function Chats(props: { chats: ChatData[] }) {
       getContactsStatus();
     }
   }, [getContactsStatus]);
-
-  useEffect(() => {
-    socketApi.on("chats", (chats) => {
-      dispatch(setChats(chats));
-      dispatch(chatConnection(id));
-    });
-  }, [dispatch, id]);
 
   useEffect(() => {
     const currentUser = localStorage.getItem("user");

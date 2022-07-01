@@ -6,12 +6,15 @@ import {
   useCallback,
   MouseEvent,
 } from "react";
+import { useParams } from "react-router-dom";
 import { useAppDispatch } from "../app/hooks";
-import { ChatData } from "../app/rooms/rooms.reducer";
-import { useSocket } from "./socket";
+import { ChatData, Message } from "../app/rooms/rooms.reducer";
+import { socketApi, useSocket } from "./socket";
 
 const useHandleMessages = () => {
   const { sendMessageSocket } = useSocket();
+
+  const [needBack, setNeedBack] = useState(false);
 
   const [chosenEmoji, setChosenEmoji] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -19,21 +22,46 @@ const useHandleMessages = () => {
   const newMessage = useRef<HTMLDivElement>(null);
   const messagesContainer = useRef<HTMLDivElement>(null);
 
-  const dispatch = useAppDispatch();
+  const { id } = useParams();
 
-  // const sentMessages = useAppSelector(messages);
+  const dispatch = useAppDispatch();
 
   const scrollMessages = () => {
     const messagesScroll = messagesContainer.current;
 
     if (messagesScroll) {
-      messagesScroll.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
+      messagesScroll.scrollTop = 0;
+      messagesScroll.style.scrollBehavior = "smooth";
     }
   };
+  const getScrollHeight = useCallback(
+    (
+      e: React.UIEvent<HTMLElement>,
+      messagesPerUser: { [key: string]: { [key: number]: Message[] } },
+      id: string | undefined,
+      page: number
+    ) => {
+      if (id && !messagesPerUser[id]) {
+        return;
+      }
+      const isScrolledToTop =
+        Number(e.currentTarget.scrollTop) +
+          Number(e.currentTarget.scrollHeight) -
+          Number(e.currentTarget.clientHeight) ===
+        0;
 
+      if (isScrolledToTop) {
+        socketApi.emit("get more messages", page + 1, id);
+      }
+
+      if (e.currentTarget && e.currentTarget.scrollTop < -200) {
+        setNeedBack(true);
+      } else {
+        setNeedBack(false);
+      }
+    },
+    []
+  );
   const onEmojiClick = useCallback((event: any, emojiObject: any) => {
     const messageInput = newMessage.current;
 
@@ -51,8 +79,6 @@ const useHandleMessages = () => {
 
         const value = e.currentTarget.innerText;
         if (id) {
-          console.log(id);
-
           sendMessageSocket(value, id);
         }
 
@@ -71,6 +97,7 @@ const useHandleMessages = () => {
       }
 
       newMessage.current!.innerText = "";
+
       scrollMessages();
     },
     []
@@ -93,6 +120,9 @@ const useHandleMessages = () => {
     messagesContainer,
     newMessage,
     showPicker,
+    getScrollHeight,
+    needBack,
+    setNeedBack,
   };
 };
 

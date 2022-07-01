@@ -2,9 +2,10 @@ import { lazy } from "react";
 import { useHandleMessages } from "../../hooks/handleMessages";
 import { useParams } from "react-router-dom";
 
+import Picker from "emoji-picker-react";
+
 import messageInputStyles from "./sendMessage.module.css";
 
-const Picker = lazy(() => import("emoji-picker-react"));
 const PickEmoji = lazy(
   () => import("@mui/icons-material/SentimentSatisfiedAlt")
 );
@@ -60,6 +61,12 @@ const SendMessage = () => {
           contentEditable
           placeholder="Write a message ..."
           onKeyDown={(e) => handleInputOnEnter(e, id)}
+          onKeyUp={(e) => {
+            if (e.code === "Enter" && !e.shiftKey && showPicker) {
+              e.preventDefault();
+              showEmojiPicker();
+            }
+          }}
         ></div>
         <button
           onClick={showEmojiPicker}
@@ -70,7 +77,10 @@ const SendMessage = () => {
 
         <button
           className={messageInputStyles.sendBtn}
-          onClick={(e) => handleInputOnClick(e, id)}
+          onClick={(e) => {
+            handleInputOnClick(e, id);
+            showEmojiPicker();
+          }}
         >
           <SendIcon
             style={{
