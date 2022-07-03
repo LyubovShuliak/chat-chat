@@ -42,7 +42,7 @@ io.on("connection", async (socket) => {
 io.use(async (socket, next) => {
   const userID = socket.handshake.auth.userID;
 
-  await pubClient.hSet("sessions", `session:${userID}`, userID);
+  // await pubClient.hSet("sessions", `session:${userID}`, userID);
 
   // pubClient.hKeys("sessions").then(console.log);
 

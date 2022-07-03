@@ -80,7 +80,7 @@ const useProfileFeatures = () => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          dispatch(addAvatar({ email, avatar: downloadURL }));
+          if (downloadURL) dispatch(addAvatar({ email, avatar: downloadURL }));
         });
       }
     );

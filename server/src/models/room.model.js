@@ -58,6 +58,8 @@ async function findSessionChat(id, query, chatId) {
   const { limit, skip } = getPagination(query);
 
   try {
+    const session = await sessions.findOne({ id: id });
+    if (!session) return;
     const newMessages = {};
 
     const paginated = await sessions.findOne({ id: id }).select({
@@ -66,11 +68,12 @@ async function findSessionChat(id, query, chatId) {
         [chatId]: { $slice: [skip, limit] },
       },
     });
+
     const unreadMessages = (await sessions.findOne({ id: id })).messages[
       chatId
     ].filter((message) => !message.isRead);
 
-    if (unreadMessages.length > 20) {
+    if (unreadMessages && unreadMessages.length > 20) {
       newMessages[chatId] = {
         [query.page]: unreadMessages,
       };

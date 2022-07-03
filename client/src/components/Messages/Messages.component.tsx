@@ -11,6 +11,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Fab from "@mui/material/Fab";
 
 import styles from "./messages.module.css";
+import { timeFormationInMessage } from "../../utils/helpers";
 const Messages = () => {
   const messagesPerUser = useAppSelector(chats);
   const messagesPagination = useAppSelector(pagination);
@@ -38,25 +39,10 @@ const Messages = () => {
       return newMessages.map((message, i, arr) => {
         const { time } = message;
 
-        const options: {
-          month: "short";
-          day: "numeric";
-        } = {
-          month: "short",
-          day: "numeric",
-        };
-
-        const dayOfThisMessage = new Intl.DateTimeFormat(
-          "en-US",
-          options
-        ).format(new Date(time));
+        const dayOfThisMessage = timeFormationInMessage(time);
 
         const dayOfPreviousMessage =
-          i !== 0
-            ? new Intl.DateTimeFormat("en-US", options).format(
-                new Date(arr[i - 1].time)
-              )
-            : dayOfThisMessage;
+          i !== 0 ? timeFormationInMessage(arr[i - 1].time) : dayOfThisMessage;
 
         if (dayOfPreviousMessage.toString() !== dayOfThisMessage.toString()) {
           return (
@@ -92,8 +78,6 @@ const Messages = () => {
       const unReadMessages = messagesPerUser[id][messagesPagination[id]]
         .filter((message) => !message.isRead)
         .map((el) => el.id);
-
-      console.log(unReadMessages);
 
       socketApi.emit(
         "message is read",
