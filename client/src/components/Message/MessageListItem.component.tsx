@@ -16,6 +16,7 @@ const MessageListItem = (props: Message) => {
 
       <div className={styles.messageInformation}>
         <span className={styles.time}>{messageDate}</span>
+        <DoneIcon color="action" sx={{ height: "20px" }} />
       </div>
     </div>
   );

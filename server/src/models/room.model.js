@@ -16,37 +16,24 @@ async function updateUserSessions(id, chatData) {
   );
 }
 
-async function findSession(id, query) {
-  const { limit, skip } = getPagination(query);
-
+async function unreadMessagesCounter(id) {
   try {
     const session = await sessions.findOne({ id: id }, { __v: 0, _id: 0 });
 
     if (session) {
       if (session.messages) {
-        const newMessages = {};
+        const unreadMessages = {};
         for (let key in session.messages) {
-          const unreadMessagesLenght = session.messages[key].filter(
+          const unreadMessagesLength = session.messages[key].filter(
             (message) => !message.isRead
           ).length;
 
-          console.log(unreadMessagesLenght);
-
-          const paginated = await sessions.findOne({ id: id }).select({
-            _id: 0,
-            messages: {
-              [key]: { $slice: [skip, limit] },
-            },
-          });
-
-          if (paginated["messages"][key].length) {
-            newMessages[key] = {
-              [query.page]: paginated["messages"][key],
-            };
+          if (unreadMessagesLength > 0) {
+            unreadMessages[key] = unreadMessagesLength;
           }
         }
 
-        return newMessages;
+        return unreadMessages;
       }
     }
   } catch (error) {
@@ -58,8 +45,6 @@ async function findSessionChat(id, query, chatId) {
   const { limit, skip } = getPagination(query);
 
   try {
-    const session = await sessions.findOne({ id: id });
-    if (!session) return;
     const newMessages = {};
 
     const paginated = await sessions.findOne({ id: id }).select({
@@ -69,18 +54,8 @@ async function findSessionChat(id, query, chatId) {
       },
     });
 
-    const unreadMessages = (await sessions.findOne({ id: id })).messages[
-      chatId
-    ].filter((message) => !message.isRead);
-
-    if (unreadMessages && unreadMessages.length > 20) {
-      newMessages[chatId] = {
-        [query.page]: unreadMessages,
-      };
-    }
-
     if (
-      unreadMessages.length < 20 &&
+      paginated &&
       paginated["messages"][chatId] &&
       paginated["messages"][chatId].length
     ) {
@@ -128,7 +103,7 @@ async function updateMessageStatus(id, unReadMessages, sender) {
 module.exports = {
   getSessions,
   updateUserSessions,
-  findSession,
+  unreadMessagesCounter,
   findSessionChat,
   saveMessage,
   updateMessageStatus,

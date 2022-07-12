@@ -7,14 +7,13 @@ import {
   MouseEvent,
 } from "react";
 import { useParams } from "react-router-dom";
-import { useAppDispatch } from "../app/hooks";
-import { ChatData, Message } from "../app/rooms/rooms.reducer";
+import { isLoading } from "../app/contacts/contacts.reducer";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { ChatData, Message, gettingMessages } from "../app/rooms/rooms.reducer";
 import { socketApi, useSocket } from "./socket";
 
 const useHandleMessages = () => {
   const { sendMessageSocket } = useSocket();
-
-  const [needBack, setNeedBack] = useState(false);
 
   const [chosenEmoji, setChosenEmoji] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -39,18 +38,23 @@ const useHandleMessages = () => {
       e: React.UIEvent<HTMLElement>,
       messagesPerUser: { [key: string]: { [key: number]: Message[] } },
       id: string | undefined,
-      page: number
+      page: number,
+      loading: boolean,
+      setNeedBack: (arg: boolean) => void
     ) => {
       if (id && !messagesPerUser[id]) {
         return;
       }
+      if (id && messagesPerUser[id][page].length < 20) return;
       const isScrolledToTop =
         Number(e.currentTarget.scrollTop) +
           Number(e.currentTarget.scrollHeight) -
           Number(e.currentTarget.clientHeight) ===
         0;
 
-      if (isScrolledToTop) {
+      if (isScrolledToTop && !loading) {
+        dispatch(gettingMessages(true));
+
         socketApi.emit("get more messages", page + 1, id);
       }
 
@@ -121,8 +125,6 @@ const useHandleMessages = () => {
     newMessage,
     showPicker,
     getScrollHeight,
-    needBack,
-    setNeedBack,
   };
 };
 

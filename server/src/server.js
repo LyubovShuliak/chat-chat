@@ -2,10 +2,9 @@ const http = require("http");
 const shell = require("shelljs");
 
 const { createClient } = require("redis");
-
 const { createAdapter } = require("@socket.io/redis-adapter");
 
-// const { instrument } = require("@socket.io/admin-ui");
+const { instrument } = require("@socket.io/admin-ui");
 
 const { Server } = require("socket.io");
 
@@ -25,18 +24,18 @@ const io = new Server(server, {
   cors: ["http://localhost:4000/", "https://admin.socket.io"],
   credentials: false,
 });
-const pubClient = createClient({ host: "localhost", port: 6379 });
-const subClient = pubClient.duplicate();
+// const pubClient = createClient({ host: "localhost", port: 6379 });
+// const subClient = pubClient.duplicate();
 
-Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-  io.adapter(createAdapter(pubClient, subClient));
-});
+// Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+//   io.adapter(createAdapter(pubClient, subClient));
+// });
 
 // instrument(io, {
 //   auth: false,
 // });
 io.on("connection", async (socket) => {
-  await socketConnected(socket, io, pubClient);
+  await socketConnected(socket, io);
 });
 
 io.use(async (socket, next) => {

@@ -47,6 +47,9 @@ const roomsSlice = createSlice({
   name: "rooms",
   initialState,
   reducers: {
+    gettingMessages: (state, action) => {
+      state.isLoading = action.payload;
+    },
     setChats: (state, action) => {
       state.sessions = action.payload;
     },
@@ -107,6 +110,12 @@ const roomsSlice = createSlice({
     setCurrentChat: (state, action) => {
       state.currentChat = action.payload;
     },
+    setUnreadMessagesCounter: (state, action) => {
+      state.chats.unReadMessages = {
+        ...state.chats.unReadMessages,
+        ...action.payload,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getUserChats.fulfilled, (state, action) => {
@@ -128,12 +137,16 @@ export const {
   chatConnection,
   chatDisconnection,
   setMessagesRead,
+  setUnreadMessagesCounter,
+  gettingMessages,
 } = roomsSlice.actions;
 
 export const rooms = (state: RootState) => state.rooms.sessions;
 export const chats = (state: RootState) => state.rooms.chats.messages;
 
 export const pagination = (state: RootState) => state.rooms.chats.pagination;
+export const unreadMessages = (state: RootState) =>
+  state.rooms.chats.unReadMessages;
 
 export const currentChat = (state: RootState) => state.rooms.currentChat;
 

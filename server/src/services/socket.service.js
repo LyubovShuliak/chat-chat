@@ -1,6 +1,5 @@
 const { v4: uuid4 } = require("uuid");
 
-const userDatabase = require("../models/user.mongo");
 const sessions = require("../models/sessions.mongo");
 
 const { findUserByID } = require("../models/user.model.js");
@@ -8,12 +7,12 @@ const {
   getSessions,
   updateUserSessions,
   findSessionChat,
-  findSession,
+  unreadMessagesCounter,
   saveMessage,
   updateMessageStatus,
 } = require("../models/room.model.js");
 
-async function socketConnected(socket, io, pubClient) {
+async function socketConnected(socket, io) {
   socket.join(socket.userID);
 
   let users = {};
@@ -30,6 +29,10 @@ async function socketConnected(socket, io, pubClient) {
 
   if (userChats.length) {
     socket.emit("chats", userChats);
+  }
+  const chatCounter = await unreadMessagesCounter(socket.userID);
+  if (chatCounter && Object.keys(chatCounter)) {
+    socket.emit("unread messages", chatCounter);
   }
 
   socket.on("get more messages", async (page, id) => {
@@ -58,8 +61,27 @@ async function socketConnected(socket, io, pubClient) {
     userID: socket.userID,
   });
 
-  socket.on("message is read", async (id, unReadMessages, sender) => {
+  socket.on("message is read", async (id, unReadMessages, sender, page) => {
     await updateMessageStatus(id, unReadMessages, sender);
+
+    const moreMessagesPerChat = await findSessionChat(
+      socket.userID,
+      {
+        limit: 20,
+        page: page,
+      },
+      id
+    );
+
+    if (Object.keys(moreMessagesPerChat)) {
+      socket.emit("messages", moreMessagesPerChat);
+    }
+    const chatCounter = await unreadMessagesCounter(socket.userID);
+    if (Object.keys(chatCounter)) {
+      socket.emit("unread messages", chatCounter);
+    } else {
+      socket.emit("unread messages", 0);
+    }
   });
 
   socket.on("private message", async ({ content, to, time }) => {

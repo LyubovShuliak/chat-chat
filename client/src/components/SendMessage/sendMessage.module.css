@@ -23,6 +23,7 @@
   position: relative;
   max-height: 300px;
   overflow-y: scroll;
+  word-break: break-all;
 
   color: black;
   align-self: stretch;

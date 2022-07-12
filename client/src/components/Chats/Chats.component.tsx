@@ -8,6 +8,7 @@ import {
   chatConnection,
   ChatData,
   setChats,
+  UnReadMessages,
 } from "../../app/rooms/rooms.reducer";
 import { getContacts } from "../../app/contacts/contacts.thunks";
 import styles from "./chats.module.css";
@@ -18,8 +19,11 @@ const ChatSearchBar = lazy(
 );
 const List = lazy(() => import("@mui/material/List"));
 
-export default function Chats(props: { chats: ChatData[] }) {
-  const { chats } = props;
+export default function Chats(props: {
+  chats: ChatData[];
+  unreadMessagesCounter: UnReadMessages;
+}) {
+  const { chats, unreadMessagesCounter } = props;
   const dispatch = useAppDispatch();
 
   const { getContactsStatus } = useSocket();
@@ -56,7 +60,14 @@ export default function Chats(props: { chats: ChatData[] }) {
                 pathname: `/${chat.id}`,
               }}
             >
-              <ChatItem chatdata={chat} />
+              <ChatItem
+                chatdata={chat}
+                viget={
+                  unreadMessagesCounter[chat.id]
+                    ? unreadMessagesCounter[chat.id]
+                    : 0
+                }
+              />
             </Link>
           );
         })}
