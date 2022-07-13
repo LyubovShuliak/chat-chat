@@ -22,18 +22,23 @@ async function unreadMessagesCounter(id) {
 
     if (session) {
       if (session.messages) {
-        const newMessages = {};
+        const unreadMessages = {};
         for (let key in session.messages) {
           const unreadMessagesLength = session.messages[key].filter(
             (message) => !message.isRead
           ).length;
 
+<<<<<<< HEAD
           if (unreadMessagesLength) {
             newMessages[key] = unreadMessagesLength;
+=======
+          if (unreadMessagesLength > 0) {
+            unreadMessages[key] = unreadMessagesLength;
+>>>>>>> f63945ac4a84caa5730a849e0b1f2a3d34f24e6f
           }
         }
 
-        return newMessages;
+        return unreadMessages;
       }
     }
   } catch (error) {
@@ -45,8 +50,6 @@ async function findSessionChat(id, query, chatId) {
   const { limit, skip } = getPagination(query);
 
   try {
-    const session = await sessions.findOne({ id: id });
-    if (!session) return;
     const newMessages = {};
 
     const paginated = await sessions.findOne({ id: id }).select({

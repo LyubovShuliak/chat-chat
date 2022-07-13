@@ -2,10 +2,9 @@ const http = require("http");
 const shell = require("shelljs");
 
 const { createClient } = require("redis");
-
 const { createAdapter } = require("@socket.io/redis-adapter");
 
-// const { instrument } = require("@socket.io/admin-ui");
+const { instrument } = require("@socket.io/admin-ui");
 
 const { Server } = require("socket.io");
 

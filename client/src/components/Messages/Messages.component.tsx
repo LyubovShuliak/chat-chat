@@ -104,7 +104,13 @@ const Messages = () => {
         ref={messagesContainer}
         onScroll={(e) => {
           if (id && messagesPerUser && messagesPagination[id]) {
-            getScrollHeight(e, messagesPerUser, id, messagesPagination[id]);
+            getScrollHeight(
+              e,
+              messagesPerUser,
+              id,
+              messagesPagination[id],
+              setNeedBack
+            );
           }
         }}
       >

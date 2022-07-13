@@ -15,27 +15,18 @@ const ListItemAvatar = lazy(() => import("@mui/material/ListItemAvatar"));
 const Avatar = lazy(() => import("@mui/material/Avatar"));
 const Typography = lazy(() => import("@mui/material/Typography" as any));
 
-const ChatItem = (props: { chatdata: ChatData }) => {
+const ChatItem = (props: { chatdata: ChatData; viget: number }) => {
   const param = useParams();
   const { userName, email, id } = props.chatdata;
+  const { viget } = props;
   const messagesPerUser = useAppSelector(chats);
   const dispatch = useAppDispatch();
 
-  const [viget, setViget] = useState<number>(0);
-  useEffect(() => {
-    messagesPerUser[id]
-      ? setViget(messagesPerUser[id][1].filter((el) => !el.isRead).length)
-      : setViget(viget);
-  }, []);
   useEffect(() => {
     if (param.id === id) {
-      setViget(0);
       if (messagesPerUser[id]) {
         dispatch(setMessagesRead(param.id));
       }
-    } else {
-      if (messagesPerUser[id])
-        setViget(messagesPerUser[id][1].filter((el) => !el.isRead).length);
     }
   }, []);
 
@@ -63,7 +54,9 @@ const ChatItem = (props: { chatdata: ChatData }) => {
             secondary={""}
           />
 
-          {viget && <div className={styles.missed_messages_viget}>{viget}</div>}
+          {viget > 0 ? (
+            <div className={styles.missed_messages_viget}>{viget}</div>
+          ) : null}
         </ListItem>
       </ul>
     </>

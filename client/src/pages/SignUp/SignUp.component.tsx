@@ -29,7 +29,11 @@ const SignUp = () => {
   }, [validateToken]);
 
   return isLogged && !isLoaded ? null : (
-    <form className="signup_form" method="post" onSubmit={handleSubmit}>
+    <form
+      className="signup_form"
+      method="post"
+      onSubmit={(e) => handleSubmit(e)}
+    >
       <h1 className="greating">Create account</h1>
       <Link
         to="/login"

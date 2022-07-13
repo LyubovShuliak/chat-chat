@@ -13,6 +13,7 @@ import {
   rooms,
   setChats,
   setCurrentChat,
+  unreadMessages,
 } from "../../app/rooms/rooms.reducer";
 
 import styles from "./chat_page.module.css";
@@ -39,9 +40,11 @@ const ChatPage = () => {
     messagesListener,
     onDisconnect,
     connect,
+    getUnreadMessagesCounter,
   } = useSocket();
 
   const messagesPagination = useAppSelector(pagination);
+  const unreadMessagesCounter = useAppSelector(unreadMessages);
 
   const location = useLocation();
 
@@ -145,11 +148,14 @@ const ChatPage = () => {
       handleDisconnect(currentUser.id);
     }
   }, []);
+  useEffect(() => {
+    getUnreadMessagesCounter();
+  }, []);
 
   return (
     <div className={styles.messages_container}>
       <Suspense>
-        <Chats chats={chats} />
+        <Chats chats={chats} unreadMessagesCounter={unreadMessagesCounter} />
       </Suspense>
       {id ? (
         <div className={styles.messages_block}>

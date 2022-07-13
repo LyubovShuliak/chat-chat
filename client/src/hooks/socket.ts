@@ -5,9 +5,11 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   chatConnection,
   chatDisconnection,
+  gettingMessages,
   pagination,
   sendMessage,
   setMessagesPerChat,
+  setUnreadMessagesCounter,
 } from "../app/rooms/rooms.reducer";
 
 export const url = "http://localhost:3050/";
@@ -28,6 +30,7 @@ function useSocket() {
   const messagesListener = useCallback(() => {
     socketApi.on("messages", (messages) => {
       dispatch(setMessagesPerChat(messages));
+      dispatch(gettingMessages(false));
     });
   }, []);
 
@@ -88,6 +91,12 @@ function useSocket() {
     });
   }, []);
 
+  const getUnreadMessagesCounter = useCallback(() => {
+    socketApi.on("unread messages", (chatCounter) => {
+      dispatch(setUnreadMessagesCounter(chatCounter));
+    });
+  }, []);
+
   return {
     connect,
     onDisconnect,
@@ -97,6 +106,7 @@ function useSocket() {
     connectStatusListener,
     getContactsStatus,
     messagesListener,
+    getUnreadMessagesCounter,
     userContacts,
   };
 }
