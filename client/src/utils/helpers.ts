@@ -20,5 +20,14 @@ const sendTime = (time: string) => {
   };
   return new Intl.DateTimeFormat("en-US", options).format(new Date(time));
 };
+function isScrolledIntoView(el: HTMLDivElement) {
+  const rect = el.getBoundingClientRect();
+  const elemTop = rect.top;
+  const elemBottom = rect.bottom;
 
-export { timeFormationInMessage, sendTime };
+  const isVisible = elemTop >= 0 && elemBottom <= window.innerHeight;
+
+  return isVisible;
+}
+
+export { timeFormationInMessage, sendTime, isScrolledIntoView };

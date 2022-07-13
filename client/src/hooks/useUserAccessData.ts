@@ -36,7 +36,7 @@ function useUserCredentials() {
     id: string;
   }) {
     if (currentUser) {
-      connect(currentUser.id);
+      connect(currentUser.id, "");
     }
 
     navigate("/", { replace: true, state: currentUser });

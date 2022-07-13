@@ -1,7 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
-import { chats, Message, pagination } from "../../app/rooms/rooms.reducer";
+import {
+  chats,
+  isLoading,
+  Message,
+  pagination,
+} from "../../app/rooms/rooms.reducer";
 import { useHandleMessages } from "../../hooks/handleMessages";
 import { socketApi } from "../../hooks/socket";
 
@@ -15,17 +20,16 @@ import { timeFormationInMessage } from "../../utils/helpers";
 const Messages = () => {
   const messagesPerUser = useAppSelector(chats);
   const messagesPagination = useAppSelector(pagination);
+  const loading = useAppSelector(isLoading);
+  const [needBack, setNeedBack] = useState(false);
 
-  const { messagesContainer, getScrollHeight, needBack, setNeedBack } =
-    useHandleMessages();
+  const { messagesContainer, getScrollHeight } = useHandleMessages();
 
   const { id } = useParams();
 
   useEffect(() => {
     if (!messagesContainer.current) return;
     messagesContainer.current.scrollTop = 0;
-
-    setNeedBack(false);
   }, [id]);
 
   const getMessages = () => {
@@ -83,9 +87,14 @@ const Messages = () => {
         "message is read",
         JSON.parse(user).id,
         unReadMessages,
-        id
+        id,
+        messagesPagination[id]
       );
     }
+  }, [id, messagesPerUser]);
+
+  useEffect(() => {
+    setNeedBack(false);
   }, [id]);
 
   return (
@@ -94,7 +103,7 @@ const Messages = () => {
         className={styles.messages_container}
         ref={messagesContainer}
         onScroll={(e) => {
-          if (id) {
+          if (id && messagesPerUser && messagesPagination[id]) {
             getScrollHeight(e, messagesPerUser, id, messagesPagination[id]);
           }
         }}

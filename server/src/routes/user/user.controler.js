@@ -19,10 +19,10 @@ async function httpSignUp(req, res) {
       error: "Missing one or more required credentials",
     });
   }
-  const errorMessage = await signUp(user);
-  if (errorMessage.error) {
+  const response = await signUp(user);
+  if (response.error) {
     return res.status(409).json({
-      error: errorMessage.error,
+      error: response.error,
     });
   }
 
@@ -34,6 +34,7 @@ async function httpSignUp(req, res) {
       user: {
         email,
         userName,
+        id: response.id,
       },
     });
   } catch (error) {

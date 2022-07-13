@@ -50,7 +50,9 @@ const useHandleMessages = () => {
           Number(e.currentTarget.clientHeight) ===
         0;
 
-      if (isScrolledToTop) {
+      if (isScrolledToTop && id && messagesPerUser[id][page].length === 20) {
+        console.log("getScrollHeight");
+
         socketApi.emit("get more messages", page + 1, id);
       }
 

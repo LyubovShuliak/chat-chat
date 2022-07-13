@@ -8,12 +8,12 @@ const {
   getSessions,
   updateUserSessions,
   findSessionChat,
-  findSession,
   saveMessage,
   updateMessageStatus,
+  unreadMessagesCounter,
 } = require("../models/room.model.js");
 
-async function socketConnected(socket, io, pubClient) {
+async function socketConnected(socket, io) {
   socket.join(socket.userID);
 
   let users = {};
@@ -26,11 +26,29 @@ async function socketConnected(socket, io, pubClient) {
     users[socket.userID] = id;
   }
 
-  const userChats = (await getSessions(socket.userID)).sessions || [];
+  const Chats = await getSessions(socket.userID);
+  const userChats = Chats ? Chats.sessions : [];
+  if (socket.chat) {
+    console.log();
+    const moreMessagesPerChat = await findSessionChat(
+      socket.userID,
+      {
+        limit: 20,
+        page: 1,
+      },
+      socket.chat
+    );
+
+    if (Object.keys(moreMessagesPerChat)) {
+      socket.emit("messages", moreMessagesPerChat);
+    }
+  }
 
   if (userChats.length) {
     socket.emit("chats", userChats);
   }
+
+  console.log(await unreadMessagesCounter(socket.userID));
 
   socket.on("get more messages", async (page, id) => {
     const moreMessagesPerChat = await findSessionChat(
@@ -42,7 +60,7 @@ async function socketConnected(socket, io, pubClient) {
       id
     );
 
-    if (Object.keys(moreMessagesPerChat)) {
+    if (moreMessagesPerChat && Object.keys(moreMessagesPerChat)) {
       socket.emit("messages", moreMessagesPerChat);
     }
   });

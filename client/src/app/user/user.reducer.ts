@@ -58,6 +58,8 @@ const usersSlice = createSlice({
       } else if (action.payload.token) {
         localStorage.setItem("access", action.payload.token);
         localStorage.setItem("user", JSON.stringify(action.payload.user));
+        console.log(action.payload.user);
+
         state.errorMesssage = "";
         state.token = action.payload.token;
         state.user = action.payload.user;
@@ -87,6 +89,7 @@ const usersSlice = createSlice({
         state.isLoading = false;
       } else {
         localStorage.setItem("user", JSON.stringify(action.payload.user));
+        console.log(action.payload.user);
 
         state.token = action.payload.token;
         state.user = action.payload.user;

@@ -25,22 +25,23 @@ const io = new Server(server, {
   cors: ["http://localhost:4000/", "https://admin.socket.io"],
   credentials: false,
 });
-const pubClient = createClient({ host: "localhost", port: 6379 });
-const subClient = pubClient.duplicate();
+// const pubClient = createClient({ host: "localhost", port: 6379 });
+// const subClient = pubClient.duplicate();
 
-Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-  io.adapter(createAdapter(pubClient, subClient));
-});
+// Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+//   io.adapter(createAdapter(pubClient, subClient));
+// });
 
 // instrument(io, {
 //   auth: false,
 // });
 io.on("connection", async (socket) => {
-  await socketConnected(socket, io, pubClient);
+  await socketConnected(socket, io);
 });
 
 io.use(async (socket, next) => {
   const userID = socket.handshake.auth.userID;
+  const chat = socket.handshake.auth.currentChat;
 
   // await pubClient.hSet("sessions", `session:${userID}`, userID);
 
@@ -50,6 +51,7 @@ io.use(async (socket, next) => {
     return next(new Error("invalid username"));
   }
   socket.userID = userID;
+  socket.chat = chat;
   next();
 });
 

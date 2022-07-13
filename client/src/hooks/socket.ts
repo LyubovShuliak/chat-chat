@@ -20,8 +20,8 @@ function useSocket() {
 
   const userContacts = useAppSelector(contacts);
 
-  const connect = useCallback((userID: string) => {
-    socketApi.auth = { userID };
+  const connect = useCallback((userID: string, currentChat: string | null) => {
+    socketApi.auth = { userID, currentChat };
     socketApi.connect();
   }, []);
 
@@ -49,6 +49,8 @@ function useSocket() {
   const messageListener = useCallback(
     (id: string, sender: string | undefined) => {
       socketApi.on("private message", ({ content, from, to }) => {
+        console.log(content, from, to);
+
         if (from === id) {
           dispatch(sendMessage({ ...content, to: to }));
         } else {

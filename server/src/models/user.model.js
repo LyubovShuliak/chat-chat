@@ -130,6 +130,12 @@ async function signUp(user) {
       console.error(err);
     }
   });
+
+  console.log({
+    userName: newUser.userName,
+    email: newUser.email,
+    id: newUser.id,
+  });
   return { userName: newUser.userName, email: newUser.email, id: newUser.id };
 }
 

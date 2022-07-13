@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   chatConnection,
   ChatData,
+  currentChat,
   pagination,
   rooms,
   setChats,
@@ -30,6 +31,7 @@ const ChatInfo = lazy(
 
 const ChatPage = () => {
   const { user, isLogged, setUser } = useUserCredentials();
+
   const {
     handleDisconnect,
     messageListener,
@@ -117,8 +119,14 @@ const ChatPage = () => {
     const user = localStorage.getItem("user");
     if (!user) return;
     if (!JSON.parse(user)) return;
-    connect(JSON.parse(user)!.id);
-  }, [user]);
+    const currentUser = location.state as {
+      email: string;
+      userName: string;
+      id: string;
+    };
+
+    connect(JSON.parse(user)!.id, id ? id : "");
+  }, []);
 
   useEffect(() => {
     const user = localStorage.getItem("user");

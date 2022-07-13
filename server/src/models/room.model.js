@@ -16,9 +16,7 @@ async function updateUserSessions(id, chatData) {
   );
 }
 
-async function findSession(id, query) {
-  const { limit, skip } = getPagination(query);
-
+async function unreadMessagesCounter(id) {
   try {
     const session = await sessions.findOne({ id: id }, { __v: 0, _id: 0 });
 
@@ -26,23 +24,12 @@ async function findSession(id, query) {
       if (session.messages) {
         const newMessages = {};
         for (let key in session.messages) {
-          const unreadMessagesLenght = session.messages[key].filter(
+          const unreadMessagesLength = session.messages[key].filter(
             (message) => !message.isRead
           ).length;
 
-          console.log(unreadMessagesLenght);
-
-          const paginated = await sessions.findOne({ id: id }).select({
-            _id: 0,
-            messages: {
-              [key]: { $slice: [skip, limit] },
-            },
-          });
-
-          if (paginated["messages"][key].length) {
-            newMessages[key] = {
-              [query.page]: paginated["messages"][key],
-            };
+          if (unreadMessagesLength) {
+            newMessages[key] = unreadMessagesLength;
           }
         }
 
@@ -69,21 +56,7 @@ async function findSessionChat(id, query, chatId) {
       },
     });
 
-    const unreadMessages = (await sessions.findOne({ id: id })).messages[
-      chatId
-    ].filter((message) => !message.isRead);
-
-    if (unreadMessages && unreadMessages.length > 20) {
-      newMessages[chatId] = {
-        [query.page]: unreadMessages,
-      };
-    }
-
-    if (
-      unreadMessages.length < 20 &&
-      paginated["messages"][chatId] &&
-      paginated["messages"][chatId].length
-    ) {
+    if (paginated["messages"][chatId] && paginated["messages"][chatId].length) {
       newMessages[chatId] = {
         [query.page]: paginated["messages"][chatId],
       };
@@ -128,8 +101,8 @@ async function updateMessageStatus(id, unReadMessages, sender) {
 module.exports = {
   getSessions,
   updateUserSessions,
-  findSession,
   findSessionChat,
   saveMessage,
   updateMessageStatus,
+  unreadMessagesCounter,
 };
