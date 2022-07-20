@@ -41,6 +41,7 @@ const ChatPage = () => {
     onDisconnect,
     connect,
     getUnreadMessagesCounter,
+    messageIsReadRecieved,
   } = useSocket();
 
   const messagesPagination = useAppSelector(pagination);
@@ -151,7 +152,9 @@ const ChatPage = () => {
   useEffect(() => {
     getUnreadMessagesCounter();
   }, []);
-
+  useEffect(() => {
+    messageIsReadRecieved();
+  }, []);
   return (
     <div className={styles.messages_container}>
       <Suspense>

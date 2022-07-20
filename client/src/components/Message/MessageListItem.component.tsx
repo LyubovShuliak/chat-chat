@@ -2,29 +2,77 @@ import styles from "./message.module.css";
 
 import MessageRead from "@mui/icons-material/DoneAll";
 import DoneIcon from "@mui/icons-material/Done";
-import { Message } from "../../app/rooms/rooms.reducer";
+import {
+  Message,
+  recieved,
+  setIsRecieved,
+} from "../../app/rooms/rooms.reducer";
 import { isScrolledIntoView, sendTime } from "../../utils/helpers";
-import { useEffect, useRef } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { socketApi } from "../../hooks/socket";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useHandleMessages } from "../../hooks/handleMessages";
 
-const MessageListItem = (props: Message) => {
+const MessageListItem = (props: {
+  message: Message;
+  setReadMessages: Dispatch<SetStateAction<string[]>>;
+  responderId: string;
+}) => {
   const messageItem = useRef<HTMLDivElement>(null);
-  const { message, type, time, isRead, id } = props;
+  const dispatch = useAppDispatch();
+  const { isScrolling } = useHandleMessages();
+
+  const [isIntoView, setIsIntoView] = useState(false);
+  const { message, type, time, isRead, id } = props.message;
 
   const messageDate = sendTime(time);
+  const isRecieve = useAppSelector(recieved);
 
   useEffect(() => {
-    if (messageItem.current) {
-      console.log(isScrolledIntoView(messageItem.current));
+    if (isIntoView && !isRecieve && isScrolling) {
+      const userId = localStorage.getItem("user");
+      if (
+        !userId ||
+        !JSON.parse(userId) ||
+        !JSON.parse(userId).id ||
+        !props.responderId
+      )
+        return;
+
+      dispatch(setIsRecieved(true));
+      socketApi.emit(
+        "message is read",
+        props.responderId,
+        id,
+        JSON.parse(userId).id
+      );
     }
-  }, [messageItem]);
+  }, [isRecieve, isScrolling]);
+
+  useEffect(() => {
+    if (
+      messageItem.current &&
+      isScrolledIntoView(messageItem.current) &&
+      isScrolling
+    ) {
+      setIsIntoView(true);
+    }
+  }, [isScrolling]);
 
   return (
-    <div className={styles[type]} ref={messageItem}>
+    <div className={styles[type]} data-id={id} data-read={isRead}>
       <p className={styles.message_text}>{message}</p>
 
       <div className={styles.messageInformation}>
         <span className={styles.time}>{messageDate}</span>
-        <DoneIcon color="action" sx={{ height: "20px" }} />
+
+        {type === "user" && !isRead ? (
+          <DoneIcon color="action" sx={{ height: "20px" }} />
+        ) : null}
+        {type === "user" && isRead ? (
+          <MessageRead color="primary" sx={{ height: "20px" }} />
+        ) : null}
       </div>
     </div>
   );

@@ -33,12 +33,14 @@ export type Chats = {
 type Contacts = {
   chats: Chats;
   isLoading: boolean;
+  recieved: boolean;
   sessions: ChatData[];
   currentChat: ChatData | null;
 };
 const initialState: Contacts = {
   chats: { messages: {}, pagination: {}, unReadMessages: {} },
   isLoading: false,
+  recieved: false,
   sessions: [],
   currentChat: null,
 };
@@ -116,6 +118,9 @@ const roomsSlice = createSlice({
         ...action.payload,
       };
     },
+    setIsRecieved: (state, action) => {
+      state.recieved = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getUserChats.fulfilled, (state, action) => {
@@ -139,6 +144,7 @@ export const {
   setMessagesRead,
   setUnreadMessagesCounter,
   gettingMessages,
+  setIsRecieved,
 } = roomsSlice.actions;
 
 export const rooms = (state: RootState) => state.rooms.sessions;
@@ -151,5 +157,6 @@ export const unreadMessages = (state: RootState) =>
 export const currentChat = (state: RootState) => state.rooms.currentChat;
 
 export const isLoading = (state: RootState) => state.rooms.isLoading;
+export const recieved = (state: RootState) => state.rooms.recieved;
 
 export const { reducer: roomsReducer } = roomsSlice;

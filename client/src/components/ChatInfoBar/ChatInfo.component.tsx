@@ -7,9 +7,7 @@ import styles from "./chatInfo.module.css";
 
 const ChatInfo = () => {
   const chat = useSelector(currentChat);
-  useEffect(() => {
-    console.log("ChatInfo", chat);
-  }, [chat]);
+
   return (
     <div className={styles.info_bar}>
       <p className={styles.name}>{chat?.userName}</p>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import {
@@ -22,15 +22,31 @@ const Messages = () => {
   const messagesPagination = useAppSelector(pagination);
   const loading = useAppSelector(isLoading);
   const [needBack, setNeedBack] = useState(false);
+  const [readMessages, setReadMessages] = useState<string[]>([]);
 
-  const { messagesContainer, getScrollHeight } = useHandleMessages();
+  const messageItems = useRef<HTMLDivElement[]>(null);
+  const { messagesContainer, getScrollHeight, scrollMessages } =
+    useHandleMessages();
 
   const { id } = useParams();
+
+  useEffect(() => {
+    scrollMessages();
+  }, [messagesPerUser]);
 
   useEffect(() => {
     if (!messagesContainer.current) return;
     messagesContainer.current.scrollTop = 0;
   }, [id]);
+
+  useEffect(() => {
+    const userId = localStorage.getItem("user");
+    if (!userId || !JSON.parse(userId) || !JSON.parse(userId).id) return;
+
+    readMessages.forEach((message) => {
+      socketApi.emit("message is read", id, message, JSON.parse(userId).id);
+    });
+  }, [readMessages]);
 
   const getMessages = () => {
     if (id && messagesPerUser[id]) {
@@ -51,7 +67,11 @@ const Messages = () => {
         if (dayOfPreviousMessage.toString() !== dayOfThisMessage.toString()) {
           return (
             <div key={message.id} className={styles.date_container}>
-              <MessageListItem {...message} />
+              <MessageListItem
+                message={message}
+                setReadMessages={setReadMessages}
+                responderId={id}
+              />
               <p className={styles.day}>{dayOfPreviousMessage}</p>
             </div>
           );
@@ -60,38 +80,25 @@ const Messages = () => {
           return (
             <div key={message.id} className={styles.date_container}>
               <p className={styles.day}>{dayOfThisMessage}</p>
-              <MessageListItem {...message} />
+              <MessageListItem
+                message={message}
+                setReadMessages={setReadMessages}
+                responderId={id}
+              />
             </div>
           );
         }
-        return <MessageListItem key={message.id} {...message} />;
+        return (
+          <MessageListItem
+            key={message.id}
+            responderId={id}
+            message={message}
+            setReadMessages={setReadMessages}
+          />
+        );
       });
     }
   };
-
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (!user || !JSON.parse(user).id || !id) return;
-
-    if (
-      messagesPagination[id] &&
-      messagesPerUser[id][messagesPagination[id]].find(
-        (message) => !message.isRead
-      )
-    ) {
-      const unReadMessages = messagesPerUser[id][messagesPagination[id]]
-        .filter((message) => !message.isRead)
-        .map((el) => el.id);
-
-      socketApi.emit(
-        "message is read",
-        JSON.parse(user).id,
-        unReadMessages,
-        id,
-        messagesPagination[id]
-      );
-    }
-  }, [id, messagesPerUser]);
 
   useEffect(() => {
     setNeedBack(false);
@@ -108,6 +115,7 @@ const Messages = () => {
               e,
               messagesPerUser,
               id,
+              loading,
               messagesPagination[id],
               setNeedBack
             );

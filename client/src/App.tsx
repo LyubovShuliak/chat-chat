@@ -9,14 +9,12 @@ import { lazy, Suspense } from "react";
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Routes>
-          <Route path="/" element={<ChatPage />} />
-          <Route path="/:id" element={<ChatPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-        </Routes>
-      </Suspense>
+      <Routes>
+        <Route path="/" element={<ChatPage />} />
+        <Route path="/:id" element={<ChatPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
     </BrowserRouter>
   );
 }

@@ -18,32 +18,51 @@ async function updateUserSessions(id, chatData) {
 
 async function unreadMessagesCounter(id) {
   try {
-    const session = await sessions.findOne({ id: id }, { __v: 0, _id: 0 });
+    const userChats = (await userDatabase.findOne({ id: id }, "sessions"))
+      .sessions;
 
-    if (session) {
-      if (session.messages) {
-        const unreadMessages = {};
-        for (let key in session.messages) {
-          const unreadMessagesLength = session.messages[key].filter(
-            (message) => !message.isRead
-          ).length;
-
-<<<<<<< HEAD
-          if (unreadMessagesLength) {
-            newMessages[key] = unreadMessagesLength;
-=======
-          if (unreadMessagesLength > 0) {
-            unreadMessages[key] = unreadMessagesLength;
->>>>>>> f63945ac4a84caa5730a849e0b1f2a3d34f24e6f
-          }
+    const unreadMessages = {};
+    for (let session of userChats) {
+      const unreadMessagesCount = sessions
+        .aggregate()
+        .match({ id: id })
+        .unwind({ path: `$messages.${session.id}` })
+        .match({
+          [`messages.${session.id}.type`]: "user",
+          [`messages.${session.id}.isRead`]: false,
+        })
+        .group({ _id: session.id, count: { $count: {} } })
+        .cursor();
+      for await (doc of unreadMessagesCount) {
+        if (doc?.count) {
+          unreadMessages[session.id] = doc.count;
         }
-
-        return unreadMessages;
       }
     }
+
+    return unreadMessages;
   } catch (error) {
     console.log(error);
   }
+}
+
+async function getUnreadMessages(id, chat) {
+  const userSessions = sessions
+    .aggregate()
+    .match({ id: id })
+    .unwind({ path: `$messages.${chat}` })
+    .match({ [`messages.${chat}.isRead`]: false })
+    .project({ _id: 0, messages: 1 })
+    .cursor();
+
+  let messages = [];
+  for await (doc of userSessions) {
+    if (doc) {
+      messages.push(doc.messages[chat]);
+    }
+  }
+
+  return messages;
 }
 
 async function findSessionChat(id, query, chatId) {
@@ -51,6 +70,15 @@ async function findSessionChat(id, query, chatId) {
 
   try {
     const newMessages = {};
+    const unReadMessages = await getUnreadMessages(id, chatId);
+
+    if (unReadMessages.length) {
+      newMessages[chatId] = {
+        [query.page]: unReadMessages,
+      };
+
+      return newMessages;
+    }
 
     const paginated = await sessions.findOne({ id: id }).select({
       _id: 0,
@@ -59,12 +87,16 @@ async function findSessionChat(id, query, chatId) {
       },
     });
 
-    if (paginated["messages"][chatId] && paginated["messages"][chatId].length) {
+    if (
+      paginated &&
+      paginated["messages"] &&
+      paginated["messages"][chatId] &&
+      paginated["messages"][chatId].length
+    ) {
       newMessages[chatId] = {
         [query.page]: paginated["messages"][chatId],
       };
     }
-
     return newMessages;
   } catch (error) {
     console.log(error);
@@ -90,6 +122,7 @@ async function saveMessage(session, id, responder, message) {
 async function updateMessageStatus(id, unReadMessages, sender) {
   const session = await sessions.findOne({ id: id }).lean();
 
+  if (!session.messages[sender]) return;
   const newMessages = session.messages[sender].map((el) =>
     unReadMessages.includes(el.id) ? { ...el, isRead: true } : el
   );

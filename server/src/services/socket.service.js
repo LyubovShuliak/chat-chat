@@ -17,18 +17,16 @@ async function socketConnected(socket, io) {
 
   let users = {};
 
+  for (let [id, socket] of io.of("/").sockets) {
+    users[socket.userID] = id;
+  }
   socket.on("disconnect", () => {
     socket.broadcast.emit("user disconnected", { id: socket.userID });
   });
 
-  for (let [id, socket] of io.of("/").sockets) {
-    users[socket.userID] = id;
-  }
-
   const Chats = await getSessions(socket.userID);
   const userChats = Chats ? Chats.sessions : [];
   if (socket.chat) {
-    console.log();
     const moreMessagesPerChat = await findSessionChat(
       socket.userID,
       {
@@ -50,8 +48,6 @@ async function socketConnected(socket, io) {
   if (chatCounter && Object.keys(chatCounter)) {
     socket.emit("unread messages", chatCounter);
   }
-
-  console.log(await unreadMessagesCounter(socket.userID));
 
   socket.on("get more messages", async (page, id) => {
     const moreMessagesPerChat = await findSessionChat(
@@ -79,21 +75,11 @@ async function socketConnected(socket, io) {
     userID: socket.userID,
   });
 
-  socket.on("message is read", async (id, unReadMessages, sender, page) => {
+  socket.on("message is read", async (id, unReadMessages, sender) => {
+    console.log(id, unReadMessages, sender);
     await updateMessageStatus(id, unReadMessages, sender);
-
-    const moreMessagesPerChat = await findSessionChat(
-      socket.userID,
-      {
-        limit: 20,
-        page: page,
-      },
-      id
-    );
-
-    if (Object.keys(moreMessagesPerChat)) {
-      socket.emit("messages", moreMessagesPerChat);
-    }
+    await updateMessageStatus(sender, unReadMessages, id);
+    socket.emit("recieved");
     const chatCounter = await unreadMessagesCounter(socket.userID);
     if (Object.keys(chatCounter)) {
       socket.emit("unread messages", chatCounter);
@@ -136,7 +122,7 @@ async function socketConnected(socket, io) {
     const senderMessage = {
       message: content,
       type: "user",
-      isRead: true,
+      isRead: false,
       id: uuid4(),
       time: time,
     };
@@ -151,7 +137,12 @@ async function socketConnected(socket, io) {
     } catch (error) {
       console.log(error);
     }
+    const Chats = await getSessions(to);
+    const userChats = Chats ? Chats.sessions : [];
 
+    if (userChats.length) {
+      io.to(to).emit("chats", userChats);
+    }
     io.to(socket.userID).emit("private message", {
       content: senderMessage,
       from: senderID,

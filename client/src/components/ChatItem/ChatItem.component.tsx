@@ -22,14 +22,6 @@ const ChatItem = (props: { chatdata: ChatData; viget: number }) => {
   const messagesPerUser = useAppSelector(chats);
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (param.id === id) {
-      if (messagesPerUser[id]) {
-        dispatch(setMessagesRead(param.id));
-      }
-    }
-  }, []);
-
   return (
     <>
       <Divider variant="inset" component="li" />

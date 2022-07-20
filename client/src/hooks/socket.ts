@@ -8,6 +8,7 @@ import {
   gettingMessages,
   pagination,
   sendMessage,
+  setIsRecieved,
   setMessagesPerChat,
   setUnreadMessagesCounter,
 } from "../app/rooms/rooms.reducer";
@@ -52,8 +53,6 @@ function useSocket() {
   const messageListener = useCallback(
     (id: string, sender: string | undefined) => {
       socketApi.on("private message", ({ content, from, to }) => {
-        console.log(content, from, to);
-
         if (from === id) {
           dispatch(sendMessage({ ...content, to: to }));
         } else {
@@ -96,6 +95,13 @@ function useSocket() {
       dispatch(setUnreadMessagesCounter(chatCounter));
     });
   }, []);
+  const messageIsReadRecieved = useCallback(() => {
+    socketApi.on("recieved", () => {
+      console.log("recieved");
+
+      dispatch(setIsRecieved(false));
+    });
+  }, []);
 
   return {
     connect,
@@ -108,6 +114,7 @@ function useSocket() {
     messagesListener,
     getUnreadMessagesCounter,
     userContacts,
+    messageIsReadRecieved,
   };
 }
 
