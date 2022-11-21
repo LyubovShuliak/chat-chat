@@ -14,19 +14,19 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(helmet());
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "..", "public")));
+// app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use("/api", userRouter);
 app.use("/api/connections", contactsRouter);
 app.use("/api/chats", chatsRouter);
 
-app.get("/", (req, res) => {
-  res.send(path.join(__dirname, "..", "public", "index.html"));
-});
+// app.get("/", (req, res) => {
+//   res.send(path.join(__dirname, "..", "public", "index.html"));
+// });
 
 module.exports = app;

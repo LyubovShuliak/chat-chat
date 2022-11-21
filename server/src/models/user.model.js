@@ -33,8 +33,8 @@ async function addAvatar(email, avatar) {
 }
 
 async function getAllUsers(limit, skip, email) {
-  const userIsContact = (await userDatabase.findOne({ email: email }).lean())
-    .contacts;
+  const userIsContact =
+    (await userDatabase.findOne({ email: email }).lean())?.contacts || [];
 
   const contacts = await userDatabase
     .find(

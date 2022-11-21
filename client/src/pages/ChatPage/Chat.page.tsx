@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 import useUserCredentials from "../../hooks/useUserAccessData";
@@ -6,9 +6,7 @@ import useUserCredentials from "../../hooks/useUserAccessData";
 import { socketApi, useSocket } from "../../hooks/socket";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  chatConnection,
   ChatData,
-  currentChat,
   pagination,
   rooms,
   setChats,

@@ -18,6 +18,7 @@
     "@types/node": "^17.0.30",
     "@types/react": "^18.0.8",
     "@types/react-dom": "^18.0.3",
+    "chat-app": "file:..",
     "debounce": "^1.2.1",
     "emoji-picker-react": "^3.5.1",
     "firebase": "^9.8.1",
@@ -31,7 +32,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "PORT=4000 react-scripts start",
+    "start": "SET PORT=4000 && react-scripts start",
     "build": "BUILD_PATH=../server/public react-scripts build",
     "dev_build": "react-scripts build",
     "test": "react-scripts test",

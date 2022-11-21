@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 3050;
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: ["http://localhost:4000/", "https://admin.socket.io"],
+  cors: ["*"],
   credentials: false,
 });
 // const pubClient = createClient({ host: "localhost", port: 6379 });

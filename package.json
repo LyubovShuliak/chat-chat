@@ -6,12 +6,12 @@
   "scripts": {
     "install-server": "npm install --prefix server",
     "install-client": "npm install --prefix client",
-    "install": "npm run install-server && npm run install-client",
+    "install-all": "npm run install-server && npm run install-client",
     "server": "npm run watch --prefix server",
     "client": "npm start --prefix client",
     "dev": "yarn server & yarn client",
     "deploy": "npm run build --prefix client && npm start --prefix server",
-    "dev_deploy": "npm run dev_build --prefix client && npm run watch --prefix server",
+    "dev_deploy": "concurrently \"npm run watch --prefix server\" \"npm run start --prefix client\" ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -24,5 +24,9 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.30.0",
     "optimize-css-assets-webpack-plugin": "^6.0.1"
+  },
+  "dependencies": {
+    "concurrently": "^7.6.0",
+    "yarn": "^1.22.19"
   }
 }

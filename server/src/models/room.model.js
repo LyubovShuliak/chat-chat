@@ -18,8 +18,8 @@ async function updateUserSessions(id, chatData) {
 
 async function unreadMessagesCounter(id) {
   try {
-    const userChats = (await userDatabase.findOne({ id: id }, "sessions"))
-      .sessions;
+    const userChats =
+      (await userDatabase.findOne({ id: id }, "sessions"))?.sessions || [];
 
     const unreadMessages = {};
     for (let session of userChats) {

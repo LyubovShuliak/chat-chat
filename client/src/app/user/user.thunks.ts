@@ -17,6 +17,7 @@ const signUpUser = createAsyncThunk("signup", async (data: User) => {
   });
 
   const result = await response.json();
+  console.log(result);
 
   return result;
 });
